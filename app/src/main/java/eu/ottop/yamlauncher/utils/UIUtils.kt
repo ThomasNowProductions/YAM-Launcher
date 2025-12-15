@@ -169,32 +169,51 @@ class UIUtils(private val context: Context) {
         var font = sharedPreferenceManager.getTextFont()
         val style = sharedPreferenceManager.getTextStyle()
 
-        if (font == "system") {
-            val typedArray = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault, intArrayOf(android.R.attr.fontFamily))
-            font = typedArray.getString(0)
-            typedArray.recycle()
-        }
-
-        val fontId = FontMap.fonts[font]
-
-        val newFont = if (fontId != null) {
-            ResourcesCompat.getFont(context, fontId)
-        } else {
-            Typeface.create(font, Typeface.NORMAL)
+        val newFont = when (font) {
+            "system" -> {
+                val typedArray = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault, intArrayOf(android.R.attr.fontFamily))
+                val systemFont = typedArray.getString(0)
+                typedArray.recycle()
+                if (systemFont != null) {
+                    Typeface.create(systemFont, Typeface.NORMAL)
+                } else {
+                    Typeface.DEFAULT
+                }
+            }
+            "casual" -> Typeface.SANS_SERIF
+            "cursive" -> Typeface.SANS_SERIF // or Typeface.create("cursive", Typeface.NORMAL) if available
+            "monospace" -> Typeface.MONOSPACE
+            "sans-serif" -> Typeface.SANS_SERIF
+            "serif" -> Typeface.SERIF
+            "sans-serif-light", "sans-serif-thin", "sans-serif-condensed", "sans-serif-condensed-light", "sans-serif-smallcaps" -> {
+                // For these system-defined fonts, create using the string name
+                // If the system doesn't have the font, it will fall back to default
+                Typeface.create(font, Typeface.NORMAL)
+            }
+            else -> {
+                // For custom fonts, get from FontMap
+                val fontId = FontMap.fonts[font]
+                if (fontId != null) {
+                    ResourcesCompat.getFont(context, fontId)
+                } else {
+                    // Fallback to default if font not found
+                    Typeface.DEFAULT
+                }
+            }
         }
 
         when (style) {
             "normal" -> {
-                view.setTypeface(Typeface.create(newFont, Typeface.NORMAL))
+                view.typeface = newFont
             }
             "bold" -> {
-                view.setTypeface(Typeface.create(newFont, Typeface.BOLD))
+                view.typeface = Typeface.create(newFont, Typeface.BOLD)
             }
             "italic" -> {
-                view.setTypeface(Typeface.create(newFont, Typeface.ITALIC))
+                view.typeface = Typeface.create(newFont, Typeface.ITALIC)
             }
             "bold-italic" -> {
-                view.setTypeface(Typeface.create(newFont, Typeface.BOLD_ITALIC))
+                view.typeface = Typeface.create(newFont, Typeface.BOLD_ITALIC)
             }
         }
     }

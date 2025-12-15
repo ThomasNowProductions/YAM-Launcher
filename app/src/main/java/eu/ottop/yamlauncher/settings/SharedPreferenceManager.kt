@@ -48,6 +48,10 @@ class SharedPreferenceManager(private val context: Context) {
         return preferences.getString("textStyle", "normal")
     }
 
+    fun isTextShadowEnabled(): Boolean {
+        return preferences.getBoolean("textShadow", false)
+    }
+
     fun isBarVisible(): Boolean {
         return preferences.getBoolean("barVisibility", false)
     }

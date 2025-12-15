@@ -655,6 +655,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     uiUtils.setFont(menuTitle)
                 }
 
+                "textShadow" -> {
+                    uiUtils.setTextColors(binding.homeView)
+                    uiUtils.setMenuItemColors(searchView)
+                    uiUtils.setMenuItemColors(menuTitle, "A9")
+                    uiUtils.setImageColor(searchSwitcher)
+                    uiUtils.setImageColor(internetSearch)
+                }
+
                 "clockEnabled" -> {
                     uiUtils.setClockVisibility(clock)
                 }

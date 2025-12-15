@@ -63,6 +63,7 @@
     <string name="text_color">Text Color</string>
     <string name="text_font">Text Font</string>
     <string name="text_style">Text Style</string>
+    <string name="text_shadow">Text Shadow</string>
 
     <string name="operation">Operation</string>
     <string name="animation_speed">Animation Speed</string>

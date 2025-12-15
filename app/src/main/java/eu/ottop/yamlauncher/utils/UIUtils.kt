@@ -104,11 +104,19 @@ class UIUtils(private val context: Context) {
                 }
             }
             hasMethod(view, "setTextColor") -> {
-                (view as TextView).setTextColor(color)
-                view.compoundDrawables[0]?.colorFilter =
+                val textView = view as TextView
+                textView.setTextColor(color)
+                textView.compoundDrawables[0]?.colorFilter =
                     BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
-                view.compoundDrawables[2]?.colorFilter =
+                textView.compoundDrawables[2]?.colorFilter =
                     BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+
+                // Apply text shadow if enabled
+                if (sharedPreferenceManager.isTextShadowEnabled()) {
+                    textView.setShadowLayer(4f, 2f, 2f, Color.BLACK)
+                } else {
+                    textView.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
+                }
             }
             else -> {
                 view.setBackgroundColor(color)
@@ -149,6 +157,13 @@ class UIUtils(private val context: Context) {
         view.compoundDrawables[0]?.alpha = "A9".toInt(16)
         view.compoundDrawables[2]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
         view.compoundDrawables[2]?.alpha = "A9".toInt(16)
+
+        // Apply text shadow if enabled
+        if (sharedPreferenceManager.isTextShadowEnabled()) {
+            view.setShadowLayer(4f, 2f, 2f, Color.BLACK)
+        } else {
+            view.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
+        }
     }
 
     fun setTextFont(view: View) {

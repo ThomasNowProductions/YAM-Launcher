@@ -43,6 +43,13 @@
             app:key="textStyle"
             app:title="@string/text_style"
             app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:title="@string/text_shadow"
+            app:key="textShadow" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/operation"

@@ -8,9 +8,27 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import eu.ottop.yamlauncher.settings.SharedPreferenceManager
 import eu.ottop.yamlauncher.utils.UIUtils
+
+class ContactDiffCallback(
+    private val oldList: List<Pair<String, Int>>,
+    private val newList: List<Pair<String, Int>>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize() = oldList.size
+    override fun getNewListSize() = newList.size
+
+    override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean {
+        return oldList[oldPos].second == newList[newPos].second
+    }
+
+    override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean {
+        return oldList[oldPos] == newList[newPos]
+    }
+}
 
 class ContactsAdapter(
     private val activity: MainActivity,
@@ -94,9 +112,11 @@ class ContactsAdapter(
         return contacts.size
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun updateContacts(newContacts: List<Pair<String, Int>>) {
+        val diffCallback = ContactDiffCallback(contacts, newContacts)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
         contacts = newContacts.toMutableList()
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 }

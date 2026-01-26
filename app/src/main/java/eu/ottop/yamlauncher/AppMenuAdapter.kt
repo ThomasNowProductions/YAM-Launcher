@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import eu.ottop.yamlauncher.databinding.ActivityMainBinding
@@ -22,6 +23,23 @@ import eu.ottop.yamlauncher.settings.SharedPreferenceManager
 import eu.ottop.yamlauncher.utils.AppUtils
 import eu.ottop.yamlauncher.utils.UIUtils
 
+class AppDiffCallback(
+    private val oldList: List<Triple<LauncherActivityInfo, UserHandle, Int>>,
+    private val newList: List<Triple<LauncherActivityInfo, UserHandle, Int>>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize() = oldList.size
+    override fun getNewListSize() = newList.size
+
+    override fun areItemsTheSame(oldPos: Int, newPos: Int): Boolean {
+        return oldList[oldPos].first.componentName == newList[newPos].first.componentName &&
+               oldList[oldPos].third == newList[newPos].third
+    }
+
+    override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean {
+        return oldList[oldPos].first.label == newList[newPos].first.label
+    }
+}
 
 class AppMenuAdapter(
     private val activity: MainActivity,
@@ -198,9 +216,11 @@ class AppMenuAdapter(
         return apps.size
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun updateApps(newApps: List<Triple<LauncherActivityInfo, UserHandle, Int>>) {
+        val diffCallback = AppDiffCallback(apps, newApps)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
         apps = newApps.toMutableList()
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 }

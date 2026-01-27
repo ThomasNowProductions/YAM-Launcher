@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "eu.ottop.yamlauncher"
-        minSdk = 24
+        minSdk = 27
         targetSdk = 36
         versionCode = 13
         versionName = "1.8"

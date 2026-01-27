@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextClock
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -43,10 +44,12 @@ class UIUtils(private val context: Context) {
 
     fun adjustInsets(view: View) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val bars = insets.getInsets(
+            val types = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            } else {
                 WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout()
-            )
+            }
+            val bars = insets.getInsets(types)
             v.updatePadding(
                 left = bars.left,
                 top = bars.top,
@@ -149,20 +152,32 @@ class UIUtils(private val context: Context) {
                     }
                 }
             }
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             @Suppress("DEPRECATION")
             val decorView = window.decorView
+            @Suppress("DEPRECATION")
+            var systemUiVisibility = decorView.systemUiVisibility
             when (sharedPreferenceManager.getTextString()) {
-                "#FFF3F3F3" -> decorView.systemUiVisibility = decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                "#FF0C0C0C" -> decorView.systemUiVisibility = decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                "#FFF3F3F3" -> {
+                    systemUiVisibility = systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                }
+                "#FF0C0C0C" -> {
+                    systemUiVisibility = systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                }
                 "material" -> {
                     val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                     when (currentNightMode) {
-                        Configuration.UI_MODE_NIGHT_YES -> decorView.systemUiVisibility = decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                        Configuration.UI_MODE_NIGHT_NO -> decorView.systemUiVisibility = decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                        Configuration.UI_MODE_NIGHT_YES -> {
+                            systemUiVisibility = systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                        }
+                        Configuration.UI_MODE_NIGHT_NO -> {
+                            systemUiVisibility = systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                        }
                     }
                 }
             }
+            @Suppress("DEPRECATION")
+            decorView.systemUiVisibility = systemUiVisibility
         }
     }
 
@@ -488,71 +503,59 @@ class UIUtils(private val context: Context) {
 
     private fun setShortcutSize(shortcut: TextView, size: String?) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                when (size) {
-                    "tiny" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            20,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
-
-                    "small" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            24,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
-
-                    "medium" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            28,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
-
-                    "large" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            32,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
-
-                    "extra" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            36,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
-
-                    "huge" -> {
-                        shortcut.setAutoSizeTextTypeUniformWithConfiguration(
-                            5,   // Min text size in SP
-                            40,   // Max text size in SP
-                            2,    // Step granularity in SP
-                            TypedValue.COMPLEX_UNIT_SP // Unit of measurement
-                        )
-                    }
+            when (size) {
+                "tiny" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        20,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
                 }
-            } else {
-                // Fallback for API < 26: use fixed text size
-                when (size) {
-                    "tiny" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                    "small" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                    "medium" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-                    "large" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26f)
-                    "extra" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
-                    "huge" -> shortcut.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34f)
+
+                "small" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        24,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
+                }
+
+                "medium" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        28,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
+                }
+
+                "large" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        32,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
+                }
+
+                "extra" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        36,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
+                }
+
+                "huge" -> {
+                    shortcut.setAutoSizeTextTypeUniformWithConfiguration(
+                        5,   // Min text size in SP
+                        40,   // Max text size in SP
+                        2,    // Step granularity in SP
+                        TypedValue.COMPLEX_UNIT_SP // Unit of measurement
+                    )
                 }
             }
         } catch(_: Exception) {}
@@ -661,11 +664,10 @@ class UIUtils(private val context: Context) {
             }
         } else {
             @Suppress("DEPRECATION")
-            val decorView = window.decorView
             if (sharedPreferenceManager.isBarVisible()) {
-                decorView.systemUiVisibility = decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_FULLSCREEN.inv()
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
-                decorView.systemUiVisibility = decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_FULLSCREEN
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
         }
     }

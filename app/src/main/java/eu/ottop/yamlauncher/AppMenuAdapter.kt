@@ -6,6 +6,9 @@ import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.os.Build
 import android.os.UserHandle
 import android.view.LayoutInflater
 import android.view.View
@@ -136,13 +139,22 @@ class AppMenuAdapter(
             else {
                 holder.textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(activity.resources, R.drawable.keep_15px, null),null,ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null)
             }
-            holder.textView.compoundDrawables[0].colorFilter = BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                holder.textView.compoundDrawables[0].colorFilter = BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            } else {
+                holder.textView.compoundDrawables[0].colorFilter = PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+            }
         }
         // Set initial drawables
         else if (app.third != 0) {
             holder.textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_work_app, null),null, ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null)
-            holder.textView.compoundDrawables[0].colorFilter =
-                BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                holder.textView.compoundDrawables[0].colorFilter =
+                    BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            } else {
+                holder.textView.compoundDrawables[0].colorFilter =
+                    PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+            }
         }
         else {
             holder.textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null,ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null)

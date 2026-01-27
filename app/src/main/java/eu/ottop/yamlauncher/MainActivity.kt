@@ -13,6 +13,8 @@ import android.content.pm.LauncherApps
 import android.database.Cursor
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -1246,10 +1248,17 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 null,
                 null
             )
-            shortcutView.compoundDrawables[0]?.colorFilter =
-                BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
-            shortcutView.compoundDrawables[2]?.colorFilter =
-                BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                shortcutView.compoundDrawables[0]?.colorFilter =
+                    BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                shortcutView.compoundDrawables[2]?.colorFilter =
+                    BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            } else {
+                shortcutView.compoundDrawables[0]?.colorFilter =
+                    PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+                shortcutView.compoundDrawables[2]?.colorFilter =
+                    PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+            }
         } else {
             shortcutView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(resources, R.drawable.ic_empty, null), null, null, null)
         }
@@ -1278,7 +1287,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     open inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         @SuppressLint("WrongConstant")
         override fun onFling(
             e1: MotionEvent?,

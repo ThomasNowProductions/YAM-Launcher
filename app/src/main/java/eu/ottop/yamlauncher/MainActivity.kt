@@ -1287,7 +1287,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     open inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         @SuppressLint("WrongConstant")
         override fun onFling(
             e1: MotionEvent?,

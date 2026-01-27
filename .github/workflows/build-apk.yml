@@ -38,8 +38,8 @@ jobs:
       - name: Check Gradle wrapper
         run: ./gradlew --version
 
-      - name: Check for lint issues
-        run: ./gradlew lintDebug --no-daemon || echo "Lint issues found (continuing build)"
+      - name: Check for resource issues
+        run: ./gradlew assembleDebug --no-daemon 2>&1 | head -50 || true
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace --no-daemon

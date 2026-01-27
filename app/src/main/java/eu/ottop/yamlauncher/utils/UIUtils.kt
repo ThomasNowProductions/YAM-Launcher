@@ -115,14 +115,14 @@ class UIUtils(private val context: Context) {
                 textView.setTextColor(color)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     textView.compoundDrawables[0]?.colorFilter =
-                        BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                        BlendModeColorFilter(color, BlendMode.SRC_ATOP)
                     textView.compoundDrawables[2]?.colorFilter =
-                        BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                        BlendModeColorFilter(color, BlendMode.SRC_ATOP)
                 } else {
                     textView.compoundDrawables[0]?.colorFilter =
-                        PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+                        PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
                     textView.compoundDrawables[2]?.colorFilter =
-                        PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+                        PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
                 }
 
                 // Apply text shadow if enabled

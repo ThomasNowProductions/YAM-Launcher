@@ -5,8 +5,11 @@ import android.content.res.Configuration
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Build
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -15,12 +18,13 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewTreeObserver
 import android.view.Window
 import android.view.WindowInsets
-import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextClock
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -39,10 +43,12 @@ class UIUtils(private val context: Context) {
 
     fun adjustInsets(view: View) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val bars = insets.getInsets(
+            val types = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            } else {
                 WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout()
-            )
+            }
+            val bars = insets.getInsets(types)
             v.updatePadding(
                 left = bars.left,
                 top = bars.top,
@@ -106,10 +112,17 @@ class UIUtils(private val context: Context) {
             hasMethod(view, "setTextColor") -> {
                 val textView = view as TextView
                 textView.setTextColor(color)
-                textView.compoundDrawables[0]?.colorFilter =
-                    BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
-                textView.compoundDrawables[2]?.colorFilter =
-                    BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    textView.compoundDrawables[0]?.colorFilter =
+                        BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                    textView.compoundDrawables[2]?.colorFilter =
+                        BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+                } else {
+                    textView.compoundDrawables[0]?.colorFilter =
+                        PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+                    textView.compoundDrawables[2]?.colorFilter =
+                        PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
+                }
 
                 // Apply text shadow if enabled
                 if (sharedPreferenceManager.isTextShadowEnabled()) {
@@ -125,15 +138,17 @@ class UIUtils(private val context: Context) {
     }
 
     fun setStatusBarColor(window: Window) {
-        val insetController = window.insetsController
-        when (sharedPreferenceManager.getTextString()) {
-            "#FFF3F3F3" -> insetController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-            "#FF0C0C0C" -> insetController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-            "material" -> {
-                val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                when (currentNightMode) {
-                    Configuration.UI_MODE_NIGHT_YES -> insetController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-                    Configuration.UI_MODE_NIGHT_NO -> insetController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insetController = window.insetsController
+            when (sharedPreferenceManager.getTextString()) {
+                "#FFF3F3F3" -> insetController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+                "#FF0C0C0C" -> insetController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+                "material" -> {
+                    val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                    when (currentNightMode) {
+                        Configuration.UI_MODE_NIGHT_YES -> insetController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+                        Configuration.UI_MODE_NIGHT_NO -> insetController?.setSystemBarsAppearance(WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+                    }
                 }
             }
         }
@@ -153,9 +168,14 @@ class UIUtils(private val context: Context) {
         view.setTextColor(setAlpha(color, alphaHex))
         view.setHintTextColor(setAlpha(color, "A9"))
 
-        view.compoundDrawables[0]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            view.compoundDrawables[0]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+            view.compoundDrawables[2]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+        } else {
+            view.compoundDrawables[0]?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+            view.compoundDrawables[2]?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+        }
         view.compoundDrawables[0]?.alpha = "A9".toInt(16)
-        view.compoundDrawables[2]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
         view.compoundDrawables[2]?.alpha = "A9".toInt(16)
 
         // Apply text shadow if enabled
@@ -602,16 +622,25 @@ class UIUtils(private val context: Context) {
 
     // Status bar visibility
     fun setStatusBar(window: Window) {
-        val windowInsetsController = window.insetsController
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowInsetsController = window.insetsController
 
-        windowInsetsController?.let {
-            if (sharedPreferenceManager.isBarVisible()) {
-                it.show(WindowInsets.Type.statusBars())
+            windowInsetsController?.let {
+                if (sharedPreferenceManager.isBarVisible()) {
+                    it.show(WindowInsets.Type.statusBars())
+                }
+                else {
+                    it.hide(WindowInsets.Type.statusBars())
+                    it.systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
             }
-            else {
-                it.hide(WindowInsets.Type.statusBars())
-                it.systemBarsBehavior =
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } else {
+            @Suppress("DEPRECATION")
+            if (sharedPreferenceManager.isBarVisible()) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
         }
     }

@@ -1162,7 +1162,20 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 )
             }
 
-            return filteredList
+            // Sort to prioritize exact matches
+            val sortedList = filteredList.sortedWith(compareBy { appItem ->
+                val cleanItemText = stringUtils.cleanString(
+                    sharedPreferenceManager.getAppName(
+                        appItem.first.componentName.flattenToString(),
+                        appItem.third,
+                        appItem.first.label
+                    ).toString()
+                )
+                // Exact match gets 0 (first), non-exact gets 1 (later)
+                if (cleanItemText.equals(cleanQuery, ignoreCase = true)) 0 else 1
+            })
+
+            return sortedList
         }
     }
 

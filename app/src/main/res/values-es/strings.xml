@@ -184,6 +184,17 @@
     <string name="restore_wrong_app">No es una copia de seguridad de YAM Launcher</string>
     <string name="restore_error">Error al leer archivo</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Registros de depuración</string>
+    <string name="export_logs">Exportar registros</string>
+    <string name="export_logs_summary">Compartir registros para diagnosticar problemas</string>
+    <string name="clear_logs">Borrar registros</string>
+    <string name="clear_logs_summary">Eliminar todos los archivos de registro guardados</string>
+    <string name="logs_cleared">Registros borrados</string>
+    <string name="logs_export_success">Registros exportados correctamente</string>
+    <string name="logs_export_fail">Error al exportar registros</string>
+    <string name="no_logs_to_export">No hay registros para exportar</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

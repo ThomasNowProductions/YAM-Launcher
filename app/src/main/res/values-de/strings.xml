@@ -182,6 +182,17 @@
     <string name="restore_wrong_app">Keine YAM-Launcher-Sicherung</string>
     <string name="restore_error">Datei kann nicht gelesen werden</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Debug-Protokolle</string>
+    <string name="export_logs">Protokolle exportieren</string>
+    <string name="export_logs_summary">Protokolle teilen, um Probleme zu diagnostizieren</string>
+    <string name="clear_logs">Protokolle löschen</string>
+    <string name="clear_logs_summary">Alle gespeicherten Protokolldateien löschen</string>
+    <string name="logs_cleared">Protokolle gelöscht</string>
+    <string name="logs_export_success">Protokolle erfolgreich exportiert</string>
+    <string name="logs_export_fail">Export der Protokolle fehlgeschlagen</string>
+    <string name="no_logs_to_export">Keine Protokolle zum Exportieren</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

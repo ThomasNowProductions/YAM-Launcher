@@ -180,6 +180,17 @@
     <string name="restore_wrong_app">Not a YAM Launcher backup</string>
     <string name="restore_error">Failed to read file</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Debug-lokit</string>
+    <string name="export_logs">Vie lokit</string>
+    <string name="export_logs_summary">Jaa lokit ongelmien diagnosoimiseksi</string>
+    <string name="clear_logs">Tyhjennä lokit</string>
+    <string name="clear_logs_summary">Poista kaikki tallennetut lokitiedostot</string>
+    <string name="logs_cleared">Lokit tyhjennetty</string>
+    <string name="logs_export_success">Lokit viety onnistuneesti</string>
+    <string name="logs_export_fail">Lokien vienti epäonnistui</string>
+    <string name="no_logs_to_export">Ei lokitiedostoja vietäväksi</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

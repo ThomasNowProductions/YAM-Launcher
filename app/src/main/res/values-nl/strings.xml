@@ -184,6 +184,17 @@
     <string name="restore_wrong_app">Geen YAM Launcher back-up</string>
     <string name="restore_error">Lezen van bestand mislukt</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Debuglogboeken</string>
+    <string name="export_logs">Logboeken exporteren</string>
+    <string name="export_logs_summary">Logboeken delen om problemen te diagnosticeren</string>
+    <string name="clear_logs">Logboeken wissen</string>
+    <string name="clear_logs_summary">Alle opgeslagen logboekbestanden verwijderen</string>
+    <string name="logs_cleared">Logboeken gewist</string>
+    <string name="logs_export_success">Logboeken succesvol geëxporteerd</string>
+    <string name="logs_export_fail">Exporteren van logboeken mislukt</string>
+    <string name="no_logs_to_export">Geen logboeken om te exporteren</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

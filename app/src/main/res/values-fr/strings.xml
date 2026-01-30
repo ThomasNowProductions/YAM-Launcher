@@ -184,6 +184,17 @@
     <string name="restore_wrong_app">Ce n\'est pas une sauvegarde de YAM Launcher</string>
     <string name="restore_error">Échec de la lecture du fichier</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Journaux de débogage</string>
+    <string name="export_logs">Exporter les journaux</string>
+    <string name="export_logs_summary">Partager les journaux pour diagnostiquer les problèmes</string>
+    <string name="clear_logs">Effacer les journaux</string>
+    <string name="clear_logs_summary">Supprimer tous les fichiers journaux stockés</string>
+    <string name="logs_cleared">Journaux effacés</string>
+    <string name="logs_export_success">Journaux exportés avec succès</string>
+    <string name="logs_export_fail">Échec de l\'exportation des journaux</string>
+    <string name="no_logs_to_export">Aucun journal à exporter</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

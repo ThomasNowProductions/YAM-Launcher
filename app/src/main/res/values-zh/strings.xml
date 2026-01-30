@@ -184,6 +184,17 @@
     <string name="restore_wrong_app">这不是 YAM Launcher 的备份</string>
     <string name="restore_error">读取文件失败</string>
 
+    <!--Logging-->
+    <string name="debug_logs">调试日志</string>
+    <string name="export_logs">导出日志</string>
+    <string name="export_logs_summary">分享日志以帮助诊断问题</string>
+    <string name="clear_logs">清除日志</string>
+    <string name="clear_logs_summary">删除所有存储的日志文件</string>
+    <string name="logs_cleared">日志已清除</string>
+    <string name="logs_export_success">日志导出成功</string>
+    <string name="logs_export_fail">日志导出失败</string>
+    <string name="no_logs_to_export">没有可导出的日志</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

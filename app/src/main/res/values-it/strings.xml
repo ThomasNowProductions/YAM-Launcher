@@ -191,6 +191,17 @@
     <string name="restore_wrong_app">Non è un backup di YAM Launcher</string>
     <string name="restore_error">Impossibile leggere il file</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Log di debug</string>
+    <string name="export_logs">Esporta log</string>
+    <string name="export_logs_summary">Condividi i log per diagnosticare i problemi</string>
+    <string name="clear_logs">Cancella log</string>
+    <string name="clear_logs_summary">Elimina tutti i file di log salvati</string>
+    <string name="logs_cleared">Log cancellati</string>
+    <string name="logs_export_success">Log esportati con successo</string>
+    <string name="logs_export_fail">Esportazione log fallita</string>
+    <string name="no_logs_to_export">Nessun log da esportare</string>
+
     <!--Location Selector Items-->
     <string name="location_link"><![CDATA[Dati di localizzazione da <a href="https://open-meteo.com/">Open-Meteo.com</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)]]></string>
     <string name="region_text">%1$s%2$s</string>

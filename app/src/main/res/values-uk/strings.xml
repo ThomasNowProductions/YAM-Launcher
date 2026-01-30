@@ -184,6 +184,17 @@
     <string name="restore_wrong_app">Це не резервна копія YAM Launcher</string>
     <string name="restore_error">Не вдалося прочитати файл</string>
 
+    <!--Logging-->
+    <string name="debug_logs">Журнали налагодження</string>
+    <string name="export_logs">Експорт журналів</string>
+    <string name="export_logs_summary">Поділитися журналами для діагностики проблем</string>
+    <string name="clear_logs">Очистити журнали</string>
+    <string name="clear_logs_summary">Видалити всі збережені файли журналів</string>
+    <string name="logs_cleared">Журнали очищено</string>
+    <string name="logs_export_success">Журнали успішно експортовано</string>
+    <string name="logs_export_fail">Не вдалося експортувати журнали</string>
+    <string name="no_logs_to_export">Немає журналів для експорту</string>
+
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 

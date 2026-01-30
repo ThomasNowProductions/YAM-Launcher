@@ -457,7 +457,7 @@ class UIUtils(private val context: Context) {
             view.gravity = when (alignment) {
                 "left" -> Gravity.CENTER_VERTICAL or Gravity.START
 
-                "center" -> Gravity.CENTER
+                "center" -> Gravity.CENTER_VERTICAL or Gravity.CENTER_HORIZONTAL
 
                 "right" -> Gravity.CENTER_VERTICAL or Gravity.END
 

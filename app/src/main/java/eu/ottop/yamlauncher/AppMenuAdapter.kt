@@ -61,7 +61,6 @@ class AppMenuAdapter(
         private val uiUtils = UIUtils(activity)
         private val appUtils = AppUtils(activity, launcherApps)
         private val logger = Logger.getInstance(activity)
-        private var appActionMenu = AppActionMenu(activity, binding, launcherApps, activity.findViewById(R.id.searchView))
 
     interface OnItemClickListener {
         fun onItemClick(appInfo: LauncherActivityInfo, userHandle: UserHandle)
@@ -73,50 +72,61 @@ class AppMenuAdapter(
 
     interface OnItemLongClickListener {
         fun onItemLongClick(
-            textView: TextView,
-            actionMenuLayout: LinearLayout
+            appInfo: LauncherActivityInfo,
+            userHandle: UserHandle,
+            userProfile: Int
         )
     }
 
     inner class AppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val listItem: FrameLayout = itemView.findViewById(R.id.listItem)
         val textView: TextView = listItem.findViewById(R.id.appName)
-        val actionMenuLayout: LinearLayout = listItem.findViewById(R.id.actionMenu)
         val editView: LinearLayout = listItem.findViewById(R.id.renameView)
         val editText: TextInputEditText = editView.findViewById(R.id.appNameEdit)
 
         init {
             textView.setOnClickListener {
-                    val position = bindingAdapterPosition
-                    val app = apps[position].first
+                val position = bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION || position >= apps.size) {
+                    return@setOnClickListener
+                }
+                val entry = apps[position]
+                val app = entry.first
 
-                    // If opened to select a shortcut, set the shortcut instead of launching the app
-                    if (shortcutTextView != null) {
-                        shortcutListener.onShortcut(app, apps[position].second, textView, apps[position].third, shortcutTextView!!, shortcutIndex)
-                    }
-                    else {
-                        itemClickListener.onItemClick(app, apps[position].second)
-                    }
+                // If opened to select a shortcut, set the shortcut instead of launching the app
+                val localShortcut = shortcutTextView
+                if (localShortcut != null) {
+                    shortcutListener.onShortcut(app, entry.second, textView, entry.third, localShortcut, shortcutIndex)
+                }
+                else {
+                    itemClickListener.onItemClick(app, entry.second)
+                }
             }
 
             textView.setOnLongClickListener {
                 val position = bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION || position >= apps.size) {
+                    return@setOnLongClickListener true
+                }
 
-                val app = apps[position].first
+                val entry = apps[position]
+                val app = entry.first
 
                 // If opened to select a shortcut, set the shortcut instead of opening the action menu
-                if (shortcutTextView != null) {
-                    shortcutListener.onShortcut(app, apps[position].second, textView, apps[position].third, shortcutTextView!!, shortcutIndex)
+                val localShortcut = shortcutTextView
+                if (localShortcut != null) {
+                    shortcutListener.onShortcut(app, entry.second, textView, entry.third, localShortcut, shortcutIndex)
                     return@setOnLongClickListener true
                 } else {
 
-                itemLongClickListener.onItemLongClick(
-                    textView,
-                    actionMenuLayout
-                )
-                return@setOnLongClickListener true
-            }}
-
+                    itemLongClickListener.onItemLongClick(
+                        app,
+                        entry.second,
+                        entry.third
+                    )
+                    return@setOnLongClickListener true
+                }
+            }
         }
     }
 
@@ -127,7 +137,6 @@ class AppMenuAdapter(
     }
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
-        holder.actionMenuLayout.visibility = View.INVISIBLE
         holder.editView.visibility = View.INVISIBLE
         val app = apps[position]
 
@@ -174,32 +183,12 @@ class AppMenuAdapter(
             )
 
             holder.editText.setText(holder.textView.text)
-
-            // Remove the uninstall icon for system apps
-            if (app.first.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
-                holder.actionMenuLayout.findViewById<TextView>(R.id.uninstall).visibility =
-                    View.GONE
-            } else {
-                holder.actionMenuLayout.findViewById<TextView>(R.id.uninstall).visibility =
-                    View.VISIBLE
-            }
         }
         else {
             holder.textView.text = activity.getString(R.string.removing)
         }
 
         holder.textView.visibility = View.VISIBLE
-
-        if (isAppInstalled) {
-            appActionMenu.setActionListeners(
-                holder.textView,
-                holder.editView,
-                holder.actionMenuLayout,
-                app.first,
-                app.second,
-                app.third,
-            )
-        }
 
         ViewCompat.addAccessibilityAction(holder.textView, activity.getString(R.string.close_app_menu)) { _, _ ->
             activity.backToHome()

@@ -6,6 +6,7 @@ import android.app.SearchManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.LauncherActivityInfo
@@ -31,12 +32,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextClock
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ViewSwitcher
+import androidx.appcompat.widget.AppCompatButton
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -80,7 +83,7 @@ import kotlin.math.abs
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AppMenuAdapter.OnItemClickListener,
     AppMenuAdapter.OnShortcutListener, AppMenuAdapter.OnItemLongClickListener, ContactsAdapter.OnContactClickListener,
-    ContactsAdapter.OnContactShortcutListener {
+    ContactsAdapter.OnContactShortcutListener, AppActionBottomSheet.AppActionListener {
 
     private lateinit var weatherSystem: WeatherSystem
     private lateinit var appUtils: AppUtils
@@ -1321,11 +1324,185 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     override fun onItemLongClick(
-        textView: TextView,
-        actionMenuLayout: LinearLayout,
+        appInfo: LauncherActivityInfo,
+        userHandle: UserHandle,
+        userProfile: Int
     ) {
+        val bottomSheet = AppActionBottomSheet.newInstance(appInfo, userHandle, userProfile, this)
+        bottomSheet.show(supportFragmentManager, AppActionBottomSheet.TAG)
+    }
+
+    override fun onPinApp(appActivity: LauncherActivityInfo, workProfile: Int) {
+        val componentName = appActivity.componentName.flattenToString()
+        sharedPreferenceManager.setPinnedApp(componentName, workProfile)
+        val isPinned = sharedPreferenceManager.isAppPinned(componentName, workProfile)
+        logger.i("MainActivity", "App ${appActivity.label} ${if (isPinned) "pinned" else "unpinned"}")
+        lifecycleScope.launch {
+            refreshAppMenu()
+        }
+    }
+
+    override fun onAppInfo(appActivity: LauncherActivityInfo, userHandle: UserHandle) {
+        launcherApps.startAppDetailsActivity(
+            appActivity.componentName,
+            userHandle,
+            null,
+            null
+        )
+    }
+
+    override fun onUninstallApp(appActivity: LauncherActivityInfo, userHandle: UserHandle) {
+        logger.i("MainActivity", "Uninstalling app: ${appActivity.applicationInfo.packageName}")
+        val intent = Intent(Intent.ACTION_DELETE)
+        intent.data = Uri.parse("package:${appActivity.applicationInfo.packageName}")
+        intent.putExtra(Intent.EXTRA_USER, userHandle)
+        startActivity(intent)
+        returnAllowed = false
+    }
+
+    override fun onRenameApp(appActivity: LauncherActivityInfo, userHandle: UserHandle, workProfile: Int) {
+        // Find the view holder for this app and trigger rename mode
+        val position = findAppPosition(appActivity, workProfile)
+        if (position != -1) {
+            val viewHolder = appRecycler.findViewHolderForAdapterPosition(position) as? AppMenuAdapter.AppViewHolder
+            if (viewHolder != null) {
+                startRenameMode(viewHolder.textView, viewHolder.editView, appActivity, userHandle, workProfile)
+            } else {
+                // View holder is null (view recycled), scroll to position and try again
+                appRecycler.layoutManager?.scrollToPosition(position)
+                appRecycler.post {
+                    val retryViewHolder = appRecycler.findViewHolderForAdapterPosition(position) as? AppMenuAdapter.AppViewHolder
+                    if (retryViewHolder != null) {
+                        startRenameMode(retryViewHolder.textView, retryViewHolder.editView, appActivity, userHandle, workProfile)
+                    } else {
+                        // Still can't get view holder, show error toast
+                        Toast.makeText(this@MainActivity, getString(R.string.rename_error), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private var renameLayoutListener: View.OnLayoutChangeListener? = null
+
+    private fun startRenameMode(textView: TextView, editLayout: LinearLayout, appActivity: LauncherActivityInfo, userHandle: UserHandle, workProfile: Int) {
+        disableAppMenuScroll()
         textView.visibility = View.INVISIBLE
-        animations.fadeViewIn(actionMenuLayout)
+        animations.fadeViewIn(editLayout)
+        val editText = editLayout.findViewById<EditText>(R.id.appNameEdit)
+        val resetButton = editLayout.findViewById<AppCompatButton>(R.id.reset)
+
+        val searchEnabled = sharedPreferenceManager.isSearchEnabled()
+
+        if (searchEnabled) {
+            searchView.visibility = View.INVISIBLE
+        } else {
+            searchView.visibility = View.GONE
+        }
+
+        editText.requestFocus()
+
+        // Open keyboard
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            val imm =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+        }, 100)
+
+        renameLayoutListener = View.OnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+
+            // If the keyboard is closed, exit editing mode
+            if (bottom - top > oldBottom - oldTop) {
+                editLayout.clearFocus()
+
+                animations.fadeViewOut(editLayout)
+                animations.fadeViewIn(textView)
+                if (searchEnabled) {
+                    searchView.visibility = View.VISIBLE
+                } else {
+                    searchView.visibility = View.GONE
+                }
+                enableAppMenuScroll()
+
+                // Remove the listener and clear the reference
+                renameLayoutListener?.let { listener ->
+                    binding.root.removeOnLayoutChangeListener(listener)
+                }
+                renameLayoutListener = null
+            }
+        }
+
+        binding.root.addOnLayoutChangeListener(renameLayoutListener!!)
+
+        editText.setOnEditorActionListener { _, actionId, _ ->
+
+            // Once the new name is confirmed, close the keyboard, save the new app name and update the apps on screen
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (editText.text.isNullOrBlank()) {
+                    Toast.makeText(this@MainActivity, getString(R.string.empty_rename), Toast.LENGTH_SHORT).show()
+                    return@setOnEditorActionListener true
+                }
+                val imm =
+                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(editText.windowToken, 0)
+                val newName = editText.text.toString()
+                sharedPreferenceManager.setAppName(
+                    appActivity.componentName.flattenToString(),
+                    workProfile,
+                    newName
+                )
+                logger.i("MainActivity", "App renamed from '${appActivity.label}' to '$newName'")
+                lifecycleScope.launch {
+                    applySearch()
+                }
+                enableAppMenuScroll()
+
+                // Remove the layout listener when done
+                renameLayoutListener?.let { listener ->
+                    binding.root.removeOnLayoutChangeListener(listener)
+                }
+                renameLayoutListener = null
+
+                return@setOnEditorActionListener true
+            }
+            false
+        }
+
+        resetButton.setOnClickListener {
+
+            // If reset is pressed, close keyboard, remove saved edited name and update the apps on screen
+            val imm =
+                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(editText.windowToken, 0)
+            sharedPreferenceManager.resetAppName(
+                appActivity.componentName.flattenToString(),
+                workProfile
+            )
+
+            lifecycleScope.launch {
+                applySearch()
+            }
+        }
+    }
+
+    private fun findAppPosition(appActivity: LauncherActivityInfo, workProfile: Int): Int {
+        val appsToSearch = currentFilteredApps
+        for (i in 0 until appsToSearch.size) {
+            val tuple = appsToSearch.getOrNull(i)
+            if (tuple?.first?.componentName == appActivity.componentName && tuple.third == workProfile) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    override fun onHideApp(appActivity: LauncherActivityInfo, workProfile: Int) {
+        logger.i("MainActivity", "Hiding app: ${appActivity.label}")
+        lifecycleScope.launch {
+            sharedPreferenceManager.setAppHidden(appActivity.componentName.flattenToString(), workProfile, true)
+            refreshAppMenu()
+        }
     }
 
     open inner class GestureListener : GestureDetector.SimpleOnGestureListener() {

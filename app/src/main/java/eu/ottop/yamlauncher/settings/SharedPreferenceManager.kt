@@ -269,7 +269,7 @@ class SharedPreferenceManager(private val context: Context) {
     }
 
     fun isInfoEnabled(): Boolean {
-        return preferences.getBoolean("infoEnabled", false)
+        return preferences.getBoolean("infoEnabled", true)
     }
 
     fun isUninstallEnabled(): Boolean {

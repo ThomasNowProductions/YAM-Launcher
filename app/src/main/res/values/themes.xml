@@ -33,4 +33,16 @@
     </style>
 
     <style name="Theme.YamLauncher" parent="Base.Theme.YamLauncher" />
+
+    <style name="Theme.YamLauncher.BottomSheet" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/AppActionBottomSheetStyle</item>
+    </style>
+
+    <style name="AppActionBottomSheetStyle" parent="Widget.Material3.BottomSheet">
+        <item name="android:background">@drawable/app_action_background</item>
+        <item name="android:backgroundTint">?attr/colorSurface</item>
+    </style>
 </resources>

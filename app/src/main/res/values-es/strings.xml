@@ -99,6 +99,8 @@
     <string name="gps_location">Ubicación GPS</string>
     <string name="latest_location">Última ubicación GPS</string>
     <string name="set_manual_location">Establecer ubicación manual</string>
+    <string name="weather_update_interval">Intervalo de actualización</string>
+    <string name="weather_update_interval_summary">p. ej., 15m, 6h, 1d (mínimo 1m)</string>
     <string name="find_your_city">"Buscar tu ciudad"</string>
     <string name="units">Unidades</string>
 

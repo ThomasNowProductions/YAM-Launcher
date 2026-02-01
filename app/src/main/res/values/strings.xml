@@ -104,6 +104,7 @@
     <string name="set_manual_location">Set Manual Location</string>
     <string name="find_your_city">"Search for Your City"</string>
     <string name="weather_update_interval">Update Interval</string>
+    <string name="weather_update_interval_summary">e.g., 15m, 6h, 1d (minimum 1m)</string>
     <string name="units">Units</string>
 
     <string name="shortcuts">Shortcuts</string>

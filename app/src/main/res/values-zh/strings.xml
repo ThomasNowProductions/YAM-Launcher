@@ -99,6 +99,8 @@
     <string name="gps_location">GPS位置</string>
     <string name="latest_location">最新的GPS位置</string>
     <string name="set_manual_location">手动设置位置</string>
+    <string name="weather_update_interval">更新间隔</string>
+    <string name="weather_update_interval_summary">例如：15m、6h、1d（最少 1m）</string>
     <string name="find_your_city">"搜索您的城市"</string>
     <string name="units">单位</string>
 

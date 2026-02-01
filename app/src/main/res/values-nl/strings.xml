@@ -99,6 +99,8 @@
     <string name="gps_location">GPS-locatie</string>
     <string name="latest_location">Laatste GPS-locatie</string>
     <string name="set_manual_location">Handmatige locatie instellen</string>
+    <string name="weather_update_interval">Update-interval</string>
+    <string name="weather_update_interval_summary">bijv. 15m, 6h, 1d (minimum 1m)</string>
     <string name="find_your_city">"Zoek uw stad"</string>
     <string name="units">Eenheden</string>
 

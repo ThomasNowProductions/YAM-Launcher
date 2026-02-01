@@ -99,6 +99,8 @@
     <string name="gps_location">Местоположение GPS</string>
     <string name="latest_location">Последнее местоположение GPS</string>
     <string name="set_manual_location">Установить местоположение вручную</string>
+    <string name="weather_update_interval">Интервал обновления</string>
+    <string name="weather_update_interval_summary">напр., 15m, 6h, 1d (минимум 1m)</string>
     <string name="find_your_city">"Найти ваш город"</string>
     <string name="units">Единицы измерения</string>
 

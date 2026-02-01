@@ -95,6 +95,8 @@
     <string name="gps_location">GPS Sijainti</string>
     <string name="latest_location">Viimeinen GPS Sijainti</string>
     <string name="set_manual_location">Aseta Manuaalinen Sijainti</string>
+    <string name="weather_update_interval">Päivitysväli</string>
+    <string name="weather_update_interval_summary">esim. 15m, 6h, 1d (vähintään 1m)</string>
     <string name="find_your_city">"Sijaintihaku"</string>
     <string name="units">Yksiköt</string>
 

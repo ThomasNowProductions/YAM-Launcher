@@ -145,6 +145,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:defaultValue="15m"
+            android:dialogMessage="@string/weather_update_interval_summary"
             app:dependency="weatherEnabled"
             app:key="weatherUpdateInterval"
             app:title="@string/weather_update_interval"

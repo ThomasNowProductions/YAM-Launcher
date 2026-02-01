@@ -234,7 +234,7 @@ class SharedPreferenceManager(private val context: Context) {
         val s = raw?.trim()?.lowercase().orEmpty()
         if (s.isEmpty()) return defaultMs
 
-        // Convenience: treat bare numbers as minutes.
+        // Convenience: treat bare numbers as minutes (e.g. "15" == "15m"); use m/h/d to specify other units.
         if (s.all { it.isDigit() }) {
             val minutes = s.toLongOrNull() ?: return defaultMs
             if (minutes <= 0L) return defaultMs

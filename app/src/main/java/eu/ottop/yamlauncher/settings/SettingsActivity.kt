@@ -200,7 +200,10 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
                 while (keys.hasNext()){
                     val key = keys.next()
                     val entry = data.getJSONObject(key)
-                    val type = entry.getString("type")
+                    val type = entry.optString("type", "")
+                    if (type.isEmpty()) {
+                        continue
+                    }
 
                     when (type) {
                         "String" -> editor.putString(key, entry.getString("value"))
@@ -218,9 +221,10 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
                                 editor.putStringSet(key, set)
                             }
                         }
+                        else -> {}
                     }
                 }
-                editor.putBoolean("isRestored", true)
+                editor.putBoolean(TRANSIENT_PREF_KEY_RESTORED, true)
 
                 editor.apply()
 

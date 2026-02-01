@@ -33,6 +33,7 @@ class LocationListAdapter(
 
             listItem.setOnClickListener {
                 val position = bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION) return@setOnClickListener
                 val name = locations[position]["name"]
                 val latitude = locations[position]["latitude"]
                 val longitude = locations[position]["longitude"]
@@ -69,7 +70,6 @@ class LocationListAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateLocations(newApps: MutableList<Map<String, String>>) {
-        locations.clear()
         locations = newApps
         notifyDataSetChanged()
     }

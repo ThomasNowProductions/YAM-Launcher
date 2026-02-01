@@ -16,6 +16,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.util.Locale
 
 class WeatherSystem(private val context: Context) {
 
@@ -71,30 +72,43 @@ class WeatherSystem(private val context: Context) {
     fun getSearchedLocations(searchTerm: String?) : MutableList<Map<String, String>> {
         val foundLocations = mutableListOf<Map<String, String>>()
 
-        val encodedSearchTerm = URLEncoder.encode(searchTerm ?: "", "UTF-8")
-        val url = URL("https://geocoding-api.open-meteo.com/v1/search?name=$encodedSearchTerm&count=50&language=en&format=json")
+        val trimmedSearchTerm = searchTerm?.trim().orEmpty()
+        if (trimmedSearchTerm.length < 2) return foundLocations
+
+        val encodedSearchTerm = URLEncoder.encode(trimmedSearchTerm, "UTF-8")
+        val language = Locale.getDefault().language.takeIf { it.isNotBlank() } ?: "en"
+        val url = URL("https://geocoding-api.open-meteo.com/v1/search?name=$encodedSearchTerm&count=50&language=$language&format=json")
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "GET"
+            connectTimeout = 5000
+            readTimeout = 8000
             try {
-                inputStream.bufferedReader().use {
+                val stream = if (responseCode in 200..299) inputStream else errorStream
+                if (stream == null) return foundLocations
+
+                stream.bufferedReader().use {
                     val response = it.readText()
                     val jsonObject = JSONObject(response)
-                    val resultArray = jsonObject.getJSONArray("results")
+                    val resultArray = jsonObject.optJSONArray("results") ?: return foundLocations
 
                     for (i in 0 until resultArray.length()) {
                         val resultObject: JSONObject = resultArray.getJSONObject(i)
 
+                        val latitude = resultObject.optDouble("latitude", Double.NaN)
+                        val longitude = resultObject.optDouble("longitude", Double.NaN)
+                        if (latitude.isNaN() || longitude.isNaN()) continue
+
                         foundLocations.add(mapOf(
-                            "name" to resultObject.getString("name"),
-                            "latitude" to resultObject.getDouble("latitude").toString(),
-                            "longitude" to resultObject.getDouble("longitude").toString(),
+                            "name" to resultObject.optString("name"),
+                            "latitude" to latitude.toString(),
+                            "longitude" to longitude.toString(),
                             "country" to resultObject.optString("country", resultObject.optString("country_code","")),
                             "region" to stringUtils.addEndTextIfNotEmpty(resultObject.optString("admin2", resultObject.optString("admin1",resultObject.optString("admin3",""))), ", ")
                         ))
                     }
                 }
             }catch (e: Exception){
-                logger.e("WeatherSystem", "Error searching locations for '$searchTerm'", e)
+                logger.e("WeatherSystem", "Error searching locations for '$trimmedSearchTerm'", e)
             }
         }
         return foundLocations
@@ -114,18 +128,23 @@ class WeatherSystem(private val context: Context) {
                     URL("https://api.open-meteo.com/v1/forecast?$location&temperature_unit=${tempUnits}&current=temperature_2m,weather_code")
                 with(url.openConnection() as HttpURLConnection) {
                     requestMethod = "GET"
+                    connectTimeout = 5000
+                    readTimeout = 8000
 
                     try {
-                        inputStream.bufferedReader().use {
+                        val stream = if (responseCode in 200..299) inputStream else errorStream
+                        if (stream == null) return@with
+
+                        stream.bufferedReader().use {
                             val response = it.readText()
 
                             val jsonObject = JSONObject(response)
 
-                            val currentData = jsonObject.getJSONObject("current")
+                            val currentData = jsonObject.optJSONObject("current") ?: return@use
 
                             var weatherType = ""
 
-                            when (currentData.getInt("weather_code")) {
+                            when (currentData.optInt("weather_code")) {
                                 0, 1 -> {
                                     weatherType = "☀\uFE0E" // Sunny
                                 }
@@ -148,7 +167,10 @@ class WeatherSystem(private val context: Context) {
 
                             }
 
-                            currentWeather = "$weatherType ${currentData.getInt("temperature_2m")}"
+                            val temperature = currentData.optInt("temperature_2m", Int.MIN_VALUE)
+                            if (temperature != Int.MIN_VALUE) {
+                                currentWeather = "$weatherType $temperature"
+                            }
 
                         }
 

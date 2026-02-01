@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,8 @@ import eu.ottop.yamlauncher.utils.WeatherSystem
 import eu.ottop.yamlauncher.utils.StringUtils
 import eu.ottop.yamlauncher.utils.UIUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -29,6 +32,10 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
     private lateinit var sharedPreferenceManager: SharedPreferenceManager
     private val stringUtils = StringUtils()
     private lateinit var uiUtils: UIUtils
+
+    private var searchJob: Job? = null
+    private var searchSeq: Int = 0
+    private var lastSubmittedQuery: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,18 +51,10 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
         sharedPreferenceManager = SharedPreferenceManager(requireContext())
 
         val searchView = view.findViewById<TextInputEditText>(R.id.locationSearch)
+        val locationLink = view.findViewById<TextView>(R.id.locationLink)
+        stringUtils.setLink(locationLink, getString(R.string.location_link))
 
-        var locationList = mutableListOf<Map<String, String>>()
-
-        stringUtils.setLink(requireActivity().findViewById(R.id.locationLink), getString(R.string.location_link))
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            locationList = weatherSystem.getSearchedLocations(
-                searchView.text.toString()
-            )
-        }
-
-        adapter = LocationListAdapter(requireContext(), locationList, this)
+        adapter = LocationListAdapter(requireContext(), mutableListOf(), this)
         val recyclerView = view.findViewById<RecyclerView>(R.id.locationRecycler)
         val appMenuEdgeFactory = AppMenuEdgeFactory(requireActivity())
         uiUtils.setSearchAlignment(searchView)
@@ -85,14 +84,27 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
             }
 
             override fun afterTextChanged(s: Editable?) {
-                // Filtering is not needed since we are creating a list with data pulled from the Open-Meteo api instead of searching an existing list
-                lifecycleScope.launch(Dispatchers.IO){
-                    val locations = weatherSystem.getSearchedLocations(
-                        searchView.text.toString()
-                    )
-                    withContext(Dispatchers.Main) {
-                        adapter?.updateLocations(locations)
+                val query = searchView.text?.toString()?.trim().orEmpty()
+
+                searchJob?.cancel()
+
+                if (query.length < 2) {
+                    lastSubmittedQuery = null
+                    adapter?.updateLocations(mutableListOf())
+                    return
+                }
+
+                if (query == lastSubmittedQuery) return
+                lastSubmittedQuery = query
+
+                val seq = ++searchSeq
+                searchJob = viewLifecycleOwner.lifecycleScope.launch {
+                    delay(350)
+                    val locations = withContext(Dispatchers.IO) {
+                        weatherSystem.getSearchedLocations(query)
                     }
+                    if (seq != searchSeq) return@launch
+                    adapter?.updateLocations(locations)
                 }
             }
         })
@@ -103,6 +115,13 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
             searchView.requestFocus()
             imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
         }
+    }
+
+    override fun onDestroyView() {
+        searchJob?.cancel()
+        searchJob = null
+        adapter = null
+        super.onDestroyView()
     }
 
     private fun showConfirmationDialog(locationName: String?, latitude: String?, longitude: String?) {

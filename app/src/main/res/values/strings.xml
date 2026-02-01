@@ -153,6 +153,7 @@
     <string name="automatically_open_keyboard">Automatically Open Keyboard</string>
     <string name="automatic_app_opening">Automatic App Opening</string>
     <string name="auto_launch_summary">Automatically launch an app when it\'s the last search result</string>
+    <string name="auto_launch_disabled_reason_web_search">Disabled because Web Search Button is enabled.</string>
 
     <string name="hidden_apps_title">Hidden Apps</string>
     <string name="hidden_apps_text">Manage Hidden Apps</string>

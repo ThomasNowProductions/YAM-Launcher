@@ -1,0 +1,35 @@
+Hey everyone, this is version 2 of YAM Launcher! I am exited to be releasing this major update, the first one since I became the new maintainer of this project. A huge thanks to Ottop for the amazing ground work he has done on this launcher, and for handing it over to me to continue development. I am exited for the future of YAM Launcher and have a lot of ideas for new features and improvements. If you have any feedback, please reach out to me on GitHub or via email.
+
+New Features
+- Bottom Sheet App Actions - App actions now appear in a modern bottom sheet menu
+- Settings Biometric Lock - Secure your launcher settings with fingerprint/face unlock
+- Configurable Weather Update Interval - Control how often weather refreshes
+- Default Launcher Popup - Added popup to set YAM as default launcher
+- Text Shadows - Added text shadow support for better readability
+Enhancements
+- Improved Search - Fixed inaccuracies, delays, and prioritizes exact matches
+- Improved Backup/Restore - More resilient settings backup and restore
+- Improved Manual Location Search - Better location lookup experience
+- App Search Performance - Significant search performance improvements
+- Settings Translucency - More modern translucent settings appearance
+- Updated About Page - Now displays app version
+- Font Loading Fix - Resolved font loading issues
+- Shortcut Alignment Fix - Proper alignment of home screen shortcuts
+Translations
+- Portuguese (Brazil) - Added PT-BR translation
+- Italian - Fixed compilation issues and updated translations
+- German - Localized settings lock option
+- Finnish - Localized settings lock strings
+- General - Multiple translation updates across all languages
+Technical Improvements
+- Android 15 Support - Updated to target Android 15 with SDK 36
+- minSdk 24 - Now supports Android 7.0+ devices
+- Gradle & AGP Upgrade - Updated to Gradle 8.11.1 and latest Android Gradle Plugin
+- Java 17 - Now using Java 17 compatibility
+- Security - Fixed potential server-side request forgery vulnerability
+Bug Fixes
+- Clear search results when closing app drawer
+- Improved search debounce handling and regex cache synchronization
+- Fixed background color issues
+- Fixed shortcut alignment issues
+- Better search result ordering

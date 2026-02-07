@@ -18,6 +18,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
     private var manualLocationPref: Preference? = null
     private var leftSwipePref: Preference? = null
     private var rightSwipePref: Preference? = null
+    private var doubleTapPref: Preference? = null
     private var clockApp: Preference? = null
     private var dateApp: Preference? = null
 
@@ -34,6 +35,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
             manualLocationPref = findPreference("manualLocation")
             leftSwipePref = findPreference("leftSwipeApp")
             rightSwipePref = findPreference("rightSwipeApp")
+            doubleTapPref = findPreference("doubleTapSwipeApp")
 
             // Only enable manual location when gps location is disabled
             if (gpsLocationPref != null && manualLocationPref != null) {
@@ -67,6 +69,11 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
                     uiUtils.switchFragment(requireActivity(), GestureAppsFragment("right"))
                     true }
 
+            doubleTapPref?.onPreferenceClickListener =
+                Preference.OnPreferenceClickListener {
+                    uiUtils.switchFragment(requireActivity(), GestureAppsFragment("doubleTap"))
+                    true }
+
             clockApp?.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {
                     uiUtils.switchFragment(requireActivity(), GestureAppsFragment("clock"))
@@ -89,6 +96,8 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
         leftSwipePref?.summary = sharedPreferenceManager.getGestureName("left")
 
         rightSwipePref?.summary = sharedPreferenceManager.getGestureName("right")
+
+        doubleTapPref?.summary = sharedPreferenceManager.getGestureName("doubleTap")
     }
 
     override fun getTitle(): String {

@@ -164,6 +164,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private lateinit var leftSwipeActivity: Pair<LauncherActivityInfo?, Int?>
     private lateinit var rightSwipeActivity: Pair<LauncherActivityInfo?, Int?>
+    private lateinit var doubleTapApp: Pair<LauncherActivityInfo?, Int?>
 
     private lateinit var gestureDetector: GestureDetector
     private lateinit var shortcutGestureDetector: GestureDetector
@@ -517,6 +518,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         leftSwipeActivity = gestureUtils.getSwipeInfo(launcherApps, "left")
         rightSwipeActivity = gestureUtils.getSwipeInfo(launcherApps, "right")
+        doubleTapApp = gestureUtils.getSwipeInfo(launcherApps, "doubleTap")
 
         swipeThreshold = sharedPreferenceManager.getSwipeThreshold()
         swipeVelocityThreshold = sharedPreferenceManager.getSwipeVelocity()
@@ -788,6 +790,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                 "rightSwipeApp" -> {
                     rightSwipeActivity = gestureUtils.getSwipeInfo(launcherApps, "right")
+                }
+
+                "doubleTapSwipe" -> {
+                    doubleTapApp = gestureUtils.getSwipeInfo(launcherApps, "doubleTap")
+                }
+
+                "doubleTapSwipeApp" -> {
+                    doubleTapApp = gestureUtils.getSwipeInfo(launcherApps, "doubleTap")
                 }
 
                 "batteryEnabled" -> {
@@ -1603,15 +1613,19 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
             if (sharedPreferenceManager.isDoubleTapEnabled()) {
-                if (gestureUtils.isAccessibilityServiceEnabled(
-                        ScreenLockService::class.java
-                    )
-                ) {
-                    val intent = Intent(this@MainActivity, ScreenLockService::class.java)
-                    intent.action = "LOCK_SCREEN"
-                    startService(intent)
+                if (sharedPreferenceManager.isGestureEnabled("doubleTap") && doubleTapApp.first != null && doubleTapApp.second != null) {
+                    appUtils.launchApp(doubleTapApp.first!!.componentName, launcherApps.profiles[doubleTapApp.second!!])
                 } else {
-                    gestureUtils.promptEnableAccessibility()
+                    if (gestureUtils.isAccessibilityServiceEnabled(
+                            ScreenLockService::class.java
+                        )
+                    ) {
+                        val intent = Intent(this@MainActivity, ScreenLockService::class.java)
+                        intent.action = "LOCK_SCREEN"
+                        startService(intent)
+                    } else {
+                        gestureUtils.promptEnableAccessibility()
+                    }
                 }
             }
 

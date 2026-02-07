@@ -254,6 +254,20 @@
             android:defaultValue="false"
             android:title="@string/double_tap_to_lock_screen"
             app:key="doubleTap" />
+        <SwitchPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:title="@string/custom_double_tap_gesture"
+            app:dependency="doubleTap"
+            app:key="doubleTapSwipe" />
+        <Preference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dependency="doubleTapSwipe"
+            app:key="doubleTapSwipeApp"
+            app:selectable="true"
+            app:title="@string/set_double_tap_app" />
     </PreferenceCategory>
 
 </PreferenceScreen>

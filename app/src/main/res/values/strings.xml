@@ -123,6 +123,8 @@
     <string name="swipe_right">Swipe Right</string>
     <string name="right_swipe_app">Right Swipe App</string>
     <string name="double_tap_to_lock_screen">Double Tap to Lock Screen</string>
+    <string name="custom_double_tap_gesture">Custom Double Tap</string>
+    <string name="set_double_tap_app">Set Double Tap App</string>
 
     <string name="app_settings_title">App Menu Settings</string>
     <string name="app_settings_text">App Menu</string>

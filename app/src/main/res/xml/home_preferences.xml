@@ -260,7 +260,7 @@
             android:defaultValue="lock"
             android:entries="@array/double_tap_action_options"
             android:entryValues="@array/double_tap_action_values"
-            android:title="@string/double_tap_action"
+            app:title="@string/double_tap_action"
             app:dependency="doubleTap"
             app:key="doubleTapAction"
             app:useSimpleSummaryProvider="true" />

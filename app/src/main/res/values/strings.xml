@@ -126,7 +126,7 @@
     <string name="double_tap">Double Tap</string>
     <string name="double_tap_action">Double Tap Action</string>
     <string name="double_tap_action_lock_screen">Lock Screen</string>
-    <string name="double_tap_action_app">Double Tap App</string>
+    <string name="double_tap_action_app">Launch App</string>
     <string name="double_tap_app">Double Tap App</string>
 
     <string name="app_settings_title">App Menu Settings</string>

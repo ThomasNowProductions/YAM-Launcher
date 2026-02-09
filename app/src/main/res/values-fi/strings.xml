@@ -128,6 +128,8 @@
     <string name="contacts_menu">Yhteystiedot</string>
     <string name="permission_denied">Tarvittavat Luvat Kielletty</string>
     <string name="internet_search">Verkkohaku Nappi</string>
+    <string name="auto_launch_disabled_reason_web_search">Poistettu käytöstä, koska verkkohakunappi on käytössä.</string>
+    <string name="web_search_disabled_reason_auto_open">Poistettu käytöstä, koska automaattinen avaus on käytössä.</string>
 
     <string name="context_menu_settings_title">Kontekstivalikon Asetukset</string>
     <string name="context_menu_settings_text">Kontekstimenu</string>

@@ -132,6 +132,8 @@
     <string name="contacts_menu">Меню контактов</string>
     <string name="permission_denied">В разрешении отказано</string>
     <string name="internet_search">Кнопка веб-поиска</string>
+    <string name="auto_launch_disabled_reason_web_search">Отключено, потому что включена кнопка веб-поиска.</string>
+    <string name="web_search_disabled_reason_auto_open">Отключено, потому что включено автоматическое открытие приложений.</string>
 
     <string name="context_menu_settings_title">Настройки контекстного меню</string>
     <string name="context_menu_settings_text">Контекстное меню</string>

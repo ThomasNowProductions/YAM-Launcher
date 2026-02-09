@@ -132,6 +132,8 @@
     <string name="contacts_menu">联系人菜单</string>
     <string name="permission_denied">权限被拒绝</string>
     <string name="internet_search">网络搜索按钮</string>
+    <string name="auto_launch_disabled_reason_web_search">由于已启用网络搜索按钮而被禁用。</string>
+    <string name="web_search_disabled_reason_auto_open">由于启用了自动打开应用而被禁用。</string>
 
     <string name="context_menu_settings_title">上下文菜单设置</string>
     <string name="context_menu_settings_text">上下文菜单</string>

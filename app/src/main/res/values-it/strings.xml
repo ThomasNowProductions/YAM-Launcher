@@ -132,6 +132,8 @@
     <string name="contacts_menu">Menu contatti</string>
     <string name="permission_denied">Permesso negato</string>
     <string name="internet_search">Cerca nel web</string>
+    <string name="auto_launch_disabled_reason_web_search">Disattivato perché il pulsante di ricerca web è attivato.</string>
+    <string name="web_search_disabled_reason_auto_open">Disattivato perché l\'apertura automatica delle app è attiva.</string>
 
     <string name="context_menu_settings_title">Impostazioni menu contestuale</string>
     <string name="context_menu_settings_text">Menu contestuale</string>

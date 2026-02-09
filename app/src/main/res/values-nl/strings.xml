@@ -132,6 +132,8 @@
     <string name="contacts_menu">Contacten-menu</string>
     <string name="permission_denied">Toestemming geweigerd</string>
     <string name="internet_search">Webzoekknop</string>
+    <string name="auto_launch_disabled_reason_web_search">Uitgeschakeld omdat de webzoekknop is ingeschakeld.</string>
+    <string name="web_search_disabled_reason_auto_open">Uitgeschakeld omdat automatisch openen is ingeschakeld.</string>
 
     <string name="context_menu_settings_title">Contextmenu instellingen</string>
     <string name="context_menu_settings_text">Contextmenu</string>

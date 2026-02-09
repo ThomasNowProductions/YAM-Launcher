@@ -132,6 +132,8 @@
     <string name="contacts_menu">Меню контактів</string>
     <string name="permission_denied">У дозволі відмовлено</string>
     <string name="internet_search">Кнопка веб-пошуку</string>
+    <string name="auto_launch_disabled_reason_web_search">Вимкнено, тому що ввімкнено кнопку веб-пошуку.</string>
+    <string name="web_search_disabled_reason_auto_open">Вимкнено, тому що ввімкнено автоматичне відкриття додатків.</string>
 
     <string name="context_menu_settings_title">Налаштування контекстного меню</string>
     <string name="context_menu_settings_text">Контекстне меню</string>

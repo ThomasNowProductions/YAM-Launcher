@@ -132,6 +132,8 @@
     <string name="contacts_menu">Menu des contacts</string>
     <string name="permission_denied">Permission refusée</string>
     <string name="internet_search">Bouton de recherche web</string>
+    <string name="auto_launch_disabled_reason_web_search">Désactivé car le bouton de recherche web est activé.</string>
+    <string name="web_search_disabled_reason_auto_open">Désactivé car l\'ouverture automatique des applications est activée.</string>
 
     <string name="context_menu_settings_title">Paramètres du menu contextuel</string>
     <string name="context_menu_settings_text">Menu contextuel</string>

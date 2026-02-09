@@ -130,6 +130,8 @@
     <string name="contacts_menu">Kontaktmenü</string>
     <string name="permission_denied">Berechtigung verweigert</string>
     <string name="internet_search">Web-Suchfunktion</string>
+    <string name="auto_launch_disabled_reason_web_search">Deaktiviert, weil die Web-Suchfunktion aktiviert ist.</string>
+    <string name="web_search_disabled_reason_auto_open">Deaktiviert, weil das automatische Öffnen aktiviert ist.</string>
 
     <string name="context_menu_settings_title">Kontextmenü-Einstellungen</string>
     <string name="context_menu_settings_text">Kontextmenü</string>

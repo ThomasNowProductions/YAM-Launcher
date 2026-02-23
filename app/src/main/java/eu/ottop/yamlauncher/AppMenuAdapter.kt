@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import eu.ottop.yamlauncher.databinding.ActivityMainBinding
 import eu.ottop.yamlauncher.settings.SharedPreferenceManager
+import eu.ottop.yamlauncher.utils.AppNameResolver
 import eu.ottop.yamlauncher.utils.AppUtils
 import eu.ottop.yamlauncher.utils.Logger
 import eu.ottop.yamlauncher.utils.UIUtils
@@ -179,7 +180,7 @@ class AppMenuAdapter(
             holder.textView.text = sharedPreferenceManager.getAppName(
                 app.first.componentName.flattenToString(),
                 app.third,
-                app.first.label
+                AppNameResolver.resolveBaseLabel(activity, app.first)
             )
 
             holder.editText.setText(holder.textView.text)

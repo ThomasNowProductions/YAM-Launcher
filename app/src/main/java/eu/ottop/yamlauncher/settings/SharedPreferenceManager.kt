@@ -405,7 +405,30 @@ class SharedPreferenceManager(private val context: Context) {
     }
 
     fun getAppName(componentName: String, profile: Int, appName: CharSequence): CharSequence? {
-        return preferences.getString("name$componentName-$profile", appName.toString())
+        val key = "name$componentName-$profile"
+        val savedName = preferences.getString(key, null)
+        if (savedName.isNullOrBlank()) {
+            preferences.edit(commit = true) {
+                val latestValue = preferences.getString(key, null)
+                if (latestValue.isNullOrBlank()) {
+                    remove(key)
+                }
+            }
+            return appName
+        }
+
+        val packageName = componentName.substringBefore("/")
+        if (savedName == packageName || savedName == componentName) {
+            preferences.edit(commit = true) {
+                val latestValue = preferences.getString(key, null)
+                if (latestValue == packageName || latestValue == componentName) {
+                    remove(key)
+                }
+            }
+            return appName
+        }
+
+        return savedName
     }
 
     fun resetAppName(componentName: String, profile: Int) {

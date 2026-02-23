@@ -42,7 +42,7 @@ class AppUtils(private val context: Context, private val launcherApps: LauncherA
                 sharedPreferenceManager.getAppName(
                     it.first.componentName.flattenToString(),
                     it.third,
-                    it.first.label
+                    AppNameResolver.resolveBaseLabel(context, it.first)
                 ).toString().lowercase()
                 }
             )
@@ -69,7 +69,7 @@ class AppUtils(private val context: Context, private val launcherApps: LauncherA
         sharedPreferenceManager.getAppName(
             it.first.componentName.flattenToString(),
             it.third,
-            it.first.label
+            AppNameResolver.resolveBaseLabel(context, it.first)
         ).toString().lowercase()
         }
         }

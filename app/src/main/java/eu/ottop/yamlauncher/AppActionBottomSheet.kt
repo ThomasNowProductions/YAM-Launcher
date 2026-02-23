@@ -16,6 +16,7 @@ import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import eu.ottop.yamlauncher.settings.SharedPreferenceManager
+import eu.ottop.yamlauncher.utils.AppNameResolver
 
 class AppActionBottomSheet : BottomSheetDialogFragment() {
 
@@ -113,7 +114,7 @@ class AppActionBottomSheet : BottomSheetDialogFragment() {
         appNameTitle.text = sharedPreferenceManager.getAppName(
             currentApp.componentName.flattenToString(),
             workProfile,
-            currentApp.label
+            AppNameResolver.resolveBaseLabel(requireContext(), currentApp)
         )
 
         setupActionButtons(view, currentApp, currentUser, currentListener)

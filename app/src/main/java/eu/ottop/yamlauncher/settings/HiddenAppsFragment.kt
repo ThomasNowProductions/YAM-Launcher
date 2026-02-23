@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import eu.ottop.yamlauncher.utils.AppMenuEdgeFactory
 import eu.ottop.yamlauncher.R
+import eu.ottop.yamlauncher.utils.AppNameResolver
 import eu.ottop.yamlauncher.utils.AppUtils
 import eu.ottop.yamlauncher.utils.StringUtils
 import eu.ottop.yamlauncher.utils.UIUtils
@@ -123,7 +124,7 @@ class HiddenAppsFragment : Fragment(), HiddenAppsAdapter.OnItemClickListener, Ti
                 val cleanItemText = stringUtils.cleanString(sharedPreferenceManager.getAppName(
                     it.first.componentName.flattenToString(),
                     it.third,
-                    it.first.label
+                    AppNameResolver.resolveBaseLabel(requireContext(), it.first)
                 ).toString())
                 if (cleanItemText != null) {
                     if (
@@ -165,7 +166,7 @@ class HiddenAppsFragment : Fragment(), HiddenAppsAdapter.OnItemClickListener, Ti
         showConfirmationDialog(appInfo, sharedPreferenceManager.getAppName(
             appInfo.componentName.flattenToString(),
             profile,
-            appInfo.label
+            AppNameResolver.resolveBaseLabel(requireContext(), appInfo)
         ).toString(), profile)
     }
 

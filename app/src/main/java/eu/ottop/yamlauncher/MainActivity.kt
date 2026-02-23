@@ -64,6 +64,7 @@ import eu.ottop.yamlauncher.tasks.ScreenLockService
 import eu.ottop.yamlauncher.utils.Animations
 import eu.ottop.yamlauncher.utils.AppMenuEdgeFactory
 import eu.ottop.yamlauncher.utils.AppMenuLinearLayoutManager
+import eu.ottop.yamlauncher.utils.AppNameResolver
 import eu.ottop.yamlauncher.utils.AppUtils
 import eu.ottop.yamlauncher.utils.BiometricUtils
 import eu.ottop.yamlauncher.utils.GestureUtils
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             val name = sharedPreferenceManager.getAppName(
                 appItem.first.componentName.flattenToString(),
                 appItem.third,
-                appItem.first.label
+                AppNameResolver.resolveBaseLabel(this, appItem.first)
             ).toString()
 
             val cleaned = stringUtils.cleanString(name).orEmpty()

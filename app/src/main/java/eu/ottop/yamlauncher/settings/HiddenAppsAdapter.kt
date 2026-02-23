@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import eu.ottop.yamlauncher.R
+import eu.ottop.yamlauncher.utils.AppNameResolver
 import eu.ottop.yamlauncher.utils.UIUtils
 
 class HiddenAppsAdapter(
@@ -71,7 +72,7 @@ class HiddenAppsAdapter(
         holder.textView.text = sharedPreferenceManager.getAppName(
             app.first.componentName.flattenToString(),
             app.third,
-            app.first.label
+            AppNameResolver.resolveBaseLabel(context, app.first)
         )
 
         holder.textView.visibility = View.VISIBLE

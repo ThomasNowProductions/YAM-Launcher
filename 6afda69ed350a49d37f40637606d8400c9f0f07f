@@ -1,0 +1,41 @@
+app/src/main/java/eu/ottop/yamlauncher/settings/SharedPreferenceManager.kt
+  b29347ca387d0c3d 408-431
+app/src/main/java/eu/ottop/yamlauncher/settings/GestureAppsFragment.kt
+  b29347ca387d0c3d 20,128,173
+app/src/main/java/eu/ottop/yamlauncher/AppActionBottomSheet.kt
+  b29347ca387d0c3d 19,117
+app/src/main/java/eu/ottop/yamlauncher/settings/GestureAppsAdapter.kt
+  b29347ca387d0c3d 15,74
+app/src/main/java/eu/ottop/yamlauncher/settings/HiddenAppsAdapter.kt
+  b29347ca387d0c3d 15,75
+app/src/main/java/eu/ottop/yamlauncher/settings/HiddenAppsFragment.kt
+  b29347ca387d0c3d 21,127,169
+app/src/main/java/eu/ottop/yamlauncher/MainActivity.kt
+  b29347ca387d0c3d 67,152
+app/src/main/java/eu/ottop/yamlauncher/AppMenuAdapter.kt
+  b29347ca387d0c3d 23,183
+app/src/main/java/eu/ottop/yamlauncher/utils/AppNameResolver.kt
+  b29347ca387d0c3d 1-43
+app/src/main/java/eu/ottop/yamlauncher/utils/AppUtils.kt
+  b29347ca387d0c3d 45,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.4",
+  "base_commit_sha": "6afda69ed350a49d37f40637606d8400c9f0f07f",
+  "prompts": {
+    "b29347ca387d0c3d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019c8c6b-0396-73d2-84e1-099b278de9aa",
+        "model": "gpt-5.3-codex"
+      },
+      "human_author": "ThomasNow Productions <thomasnowprod@proton.me>",
+      "messages": [],
+      "total_additions": 108,
+      "total_deletions": 35,
+      "accepted_lines": 85,
+      "overriden_lines": 0
+    }
+  }
+}

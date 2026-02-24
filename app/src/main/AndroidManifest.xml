@@ -33,19 +33,15 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme"
-            android:windowSoftInputMode="adjustResize"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.YamLauncher"
-            android:windowSoftInputMode="adjustResize"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

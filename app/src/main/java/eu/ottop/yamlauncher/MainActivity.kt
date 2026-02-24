@@ -1477,7 +1477,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         
         val notificationListener = NotificationListener.getInstance()
         if (notificationListener == null) {
-            if (NotificationListener.isEnabled(this)) {
+            if (!NotificationListener.isEnabled(this)) {
                 requestNotificationPermission()
             }
             return

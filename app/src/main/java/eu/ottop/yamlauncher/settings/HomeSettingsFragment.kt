@@ -1,11 +1,13 @@
 package eu.ottop.yamlauncher.settings
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import eu.ottop.yamlauncher.R
+import eu.ottop.yamlauncher.tasks.NotificationListener
 import eu.ottop.yamlauncher.utils.PermissionUtils
 import eu.ottop.yamlauncher.utils.UIUtils
 
@@ -23,6 +25,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
     private var doubleTapAppPref: Preference? = null
     private var clockApp: Preference? = null
     private var dateApp: Preference? = null
+    private var notificationDotsPref: SwitchPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.home_preferences, rootKey)
@@ -40,6 +43,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
         doubleTapTogglePref = findPreference("doubleTap")
         doubleTapActionPref = findPreference("doubleTapAction")
         doubleTapAppPref = findPreference("doubleTapSwipeApp")
+        notificationDotsPref = findPreference("notificationDots")
 
         // Only enable manual location when gps location is disabled
         if (gpsLocationPref != null && manualLocationPref != null) {
@@ -104,6 +108,16 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
             Preference.OnPreferenceClickListener {
                 uiUtils.switchFragment(requireActivity(), GestureAppsFragment("date"))
                 true
+            }
+
+        notificationDotsPref?.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                if (newValue as Boolean && !NotificationListener.isEnabled(requireContext())) {
+                    NotificationListener.requestPermission(requireContext())
+                    false
+                } else {
+                    true
+                }
             }
 
         updateDoubleTapAppPreferenceState()

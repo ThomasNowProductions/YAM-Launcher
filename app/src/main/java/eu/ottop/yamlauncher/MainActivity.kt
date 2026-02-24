@@ -53,6 +53,7 @@ import androidx.core.view.marginLeft
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
@@ -60,6 +61,7 @@ import eu.ottop.yamlauncher.databinding.ActivityMainBinding
 import eu.ottop.yamlauncher.settings.SettingsActivity
 import eu.ottop.yamlauncher.settings.SharedPreferenceManager
 import eu.ottop.yamlauncher.tasks.BatteryReceiver
+import eu.ottop.yamlauncher.tasks.NotificationListener
 import eu.ottop.yamlauncher.tasks.ScreenLockService
 import eu.ottop.yamlauncher.utils.Animations
 import eu.ottop.yamlauncher.utils.AppMenuEdgeFactory
@@ -130,6 +132,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var preferences: SharedPreferences
 
     private var isBatteryReceiverRegistered = false
+    private var isNotificationReceiverRegistered = false
     private var isSearchActive = false
     private var isInitialOpen = false
     private var canLaunchShortcut = true
@@ -532,6 +535,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     @SuppressLint("ClickableViewAccessibility")
     private fun setHomeListeners() {
         registerBatteryReceiver()
+        registerNotificationReceiver()
 
         if (!sharedPreferenceManager.isBatteryEnabled()) {
             unregisterBatteryReceiver()
@@ -848,6 +852,18 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                 "alphabetIndexPosition" -> {
                     setAlphabetIndexPosition()
+                }
+                
+                "notificationDots" -> {
+                    if (sharedPreferenceManager.isNotificationDotsEnabled()) {
+                        if (!NotificationListener.isEnabled(this@MainActivity)) {
+                            NotificationListener.requestPermission(this@MainActivity)
+                        } else {
+                            updateNotificationDots()
+                        }
+                    } else {
+                        setShortcuts()
+                    }
                 }
             }
         }
@@ -1380,9 +1396,85 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onDestroy()
 
         unregisterBatteryReceiver()
+        unregisterNotificationReceiver()
         preferences.unregisterOnSharedPreferenceChangeListener(this)
         searchJob?.cancel()
         logger.i("MainActivity", "MainActivity destroyed")
+    }
+    
+    private fun registerNotificationReceiver() {
+        if (!isNotificationReceiverRegistered) {
+            val filter = android.content.IntentFilter(NotificationListener.ACTION_NOTIFICATIONS_CHANGED)
+            LocalBroadcastManager.getInstance(this).registerReceiver(notificationReceiver, filter)
+            isNotificationReceiverRegistered = true
+        }
+    }
+    
+    private fun unregisterNotificationReceiver() {
+        if (isNotificationReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationReceiver)
+            isNotificationReceiverRegistered = false
+        }
+    }
+    
+    private val notificationReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateNotificationDots()
+        }
+    }
+    
+    private fun updateNotificationDots() {
+        if (!sharedPreferenceManager.isNotificationDotsEnabled()) return
+        
+        val notificationListener = NotificationListener.getInstance()
+        if (notificationListener == null) {
+            if (NotificationListener.isEnabled(this)) {
+                requestNotificationPermission()
+            }
+            return
+        }
+        
+        val packagesWithNotifications = notificationListener.getPackagesWithNotifications()
+        val shortcuts = arrayOf(
+            R.id.app1, R.id.app2, R.id.app3, R.id.app4, R.id.app5,
+            R.id.app6, R.id.app7, R.id.app8, R.id.app9, R.id.app10,
+            R.id.app11, R.id.app12, R.id.app13, R.id.app14, R.id.app15
+        )
+        
+        for (i in shortcuts.indices) {
+            val textView = findViewById<TextView>(shortcuts[i])
+            val savedView = sharedPreferenceManager.getShortcut(i)
+            
+            if (savedView != null && savedView.getOrNull(3)?.toBoolean() != true) {
+                val componentName = savedView[0]
+                if (componentName != "e") {
+                    val packageName = if (componentName.contains("/")) {
+                        componentName.substringBefore("/")
+                    } else {
+                        componentName
+                    }
+                    
+                    val hasNotification = packagesWithNotifications.contains(packageName)
+                    val dotDrawable = if (hasNotification) {
+                        ResourcesCompat.getDrawable(resources, R.drawable.notification_dot, null)
+                    } else {
+                        null
+                    }
+                    
+                    dotDrawable?.setTint(sharedPreferenceManager.getTextColor())
+                    textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        textView.compoundDrawablesRelative[0],
+                        null,
+                        dotDrawable,
+                        null
+                    )
+                }
+            }
+        }
+    }
+    
+    private fun requestNotificationPermission() {
+        NotificationListener.requestPermission(this)
     }
 
     override fun onStart() {
@@ -1406,7 +1498,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         returnAllowed = true
         appAdapter?.notifyDataSetChanged()
         
-        // Check and update default launcher banner visibility
+        updateNotificationDots()
+        
         updateDefaultLauncherBanner()
     }
     

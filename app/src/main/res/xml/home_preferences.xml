@@ -215,6 +215,13 @@
             android:title="@string/hidden_shortcut_title"
             android:summary="@string/hidden_shortcuts"
             app:key="showHiddenShortcuts" />
+        <SwitchPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:title="@string/notification_dots"
+            android:summary="@string/notification_dots_summary"
+            app:key="notificationDots" />
     </PreferenceCategory>
     <PreferenceCategory
         android:layout_width="wrap_content"

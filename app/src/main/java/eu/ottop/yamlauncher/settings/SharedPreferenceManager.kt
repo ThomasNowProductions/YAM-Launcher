@@ -138,6 +138,10 @@ class SharedPreferenceManager(private val context: Context) {
         return preferences.getBoolean("lockShortcuts", false)
     }
 
+    fun isNotificationDotsEnabled(): Boolean {
+        return preferences.getBoolean("notificationDots", false)
+    }
+
     // Show hidden apps in shortcut selection
     fun showHiddenShortcuts(): Boolean {
         return preferences.getBoolean("showHiddenShortcuts", true)

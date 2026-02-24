@@ -19,6 +19,7 @@ activity-compose = "1.10.1"
 
 # Other Libraries
 biometric-ktx = "1.4.0-alpha02"
+localbroadcastmanager = "1.1.0"
 
 
 [libraries]
@@ -35,6 +36,9 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 
 # Biometric
 biometric-ktx = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometric-ktx" }
+
+# LocalBroadcastManager
+localbroadcastmanager = { group = "androidx.localbroadcastmanager", name = "localbroadcastmanager", version.ref = "localbroadcastmanager" }
 
 
 [plugins]

@@ -116,6 +116,11 @@
     <string name="lock_shortcuts">Lock Shortcuts</string>
     <string name="hidden_shortcut_title">Hidden Apps</string>
     <string name="hidden_shortcuts">Show Hidden Apps in Shortcut Selection</string>
+    
+    <string name="notification_dots">Notification Dots</string>
+    <string name="notification_dots_summary">Show a dot on shortcuts when apps have notifications</string>
+    <string name="notification_permission_required">Permission Required</string>
+    <string name="notification_permission_text">Enable notification access to show notification dots</string>
 
     <string name="gestures">Gestures</string>
     <string name="swipe_left">Swipe Left</string>

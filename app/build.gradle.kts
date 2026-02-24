@@ -60,4 +60,5 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.constraintlayout)
     implementation(libs.biometric.ktx)
+    implementation(libs.localbroadcastmanager)
 }

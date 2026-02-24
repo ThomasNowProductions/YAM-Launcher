@@ -141,4 +141,9 @@
         <item>lock</item>
         <item>app</item>
     </string-array>
+
+    <string-array name="alphabet_index_position_values" translatable="false">
+        <item>left</item>
+        <item>right</item>
+    </string-array>
 </resources>

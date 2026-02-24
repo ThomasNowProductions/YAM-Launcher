@@ -73,6 +73,7 @@ import eu.ottop.yamlauncher.utils.PermissionUtils
 import eu.ottop.yamlauncher.utils.StringUtils
 import eu.ottop.yamlauncher.utils.UIUtils
 import eu.ottop.yamlauncher.utils.WeatherSystem
+import eu.ottop.yamlauncher.views.AlphabetIndexView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -113,6 +114,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var menuTitle: TextInputEditText
     private lateinit var appRecycler: RecyclerView
     private lateinit var contactRecycler: RecyclerView
+    private lateinit var alphabetIndex: AlphabetIndexView
     private lateinit var searchSwitcher: ImageView
     private lateinit var internetSearch: ImageView
     private lateinit var searchView: TextInputEditText
@@ -250,6 +252,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         searchView = binding.searchView
 
         menuView = binding.menuView
+
+        alphabetIndex = binding.alphabetIndex
 
         searchSwitcher = binding.searchSwitcher
         internetSearch = binding.internetSearch
@@ -679,6 +683,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     uiUtils.setMenuItemColors(menuTitle, "A9")
                     uiUtils.setImageColor(searchSwitcher)
                     uiUtils.setImageColor(internetSearch)
+                    if (sharedPreferenceManager.isAlphabetIndexEnabled()) {
+                        alphabetIndex.setTextColor(sharedPreferenceManager.getTextColor())
+                    }
                 }
 
                 "textFont" -> {
@@ -831,6 +838,17 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 "lockShortcuts" -> {
                     setShortcuts()
                 }
+
+                "alphabetIndexEnabled" -> {
+                    setAlphabetIndexPosition()
+                    if (sharedPreferenceManager.isAlphabetIndexEnabled()) {
+                        setupAlphabetIndex()
+                    }
+                }
+
+                "alphabetIndexPosition" -> {
+                    setAlphabetIndexPosition()
+                }
             }
         }
     }
@@ -905,6 +923,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     installedApps = updatedApps
                     currentFilteredApps = updatedApps
                     appSearchIndexDirty = true
+                    
+                    if (sharedPreferenceManager.isAlphabetIndexEnabled()) {
+                        updateAlphabetIndexLetters()
+                    }
                 }
             }
         } catch (_: UninitializedPropertyAccessException) {
@@ -976,6 +998,100 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
 
             setupInternetSearch()
+            
+            setupAlphabetIndex()
+        }
+    }
+
+    private fun setupAlphabetIndex() {
+        if (!sharedPreferenceManager.isAlphabetIndexEnabled()) {
+            return
+        }
+        
+        alphabetIndex.setTextColor(sharedPreferenceManager.getTextColor())
+        updateAlphabetIndexLetters()
+        setAlphabetIndexPosition()
+        
+        alphabetIndex.setOnLetterSelectedListener { letter ->
+            scrollToLetter(letter)
+        }
+    }
+    
+    private fun updateAlphabetIndexLetters() {
+        val availableLetters = mutableSetOf<String>()
+        for (app in installedApps) {
+            val name = sharedPreferenceManager.getAppName(
+                app.first.componentName.flattenToString(),
+                app.third,
+                AppNameResolver.resolveBaseLabel(this, app.first)
+            ).toString()
+            
+            val firstChar = name.firstOrNull()?.uppercase()
+            if (firstChar != null) {
+                if (firstChar.single().isLetter()) {
+                    availableLetters.add(firstChar)
+                } else {
+                    availableLetters.add("#")
+                }
+            }
+        }
+        alphabetIndex.setAvailableLetters(availableLetters)
+    }
+    
+    private fun setAlphabetIndexPosition() {
+        val position = sharedPreferenceManager.getAlphabetIndexPosition()
+        val layoutParams = alphabetIndex.layoutParams as android.widget.FrameLayout.LayoutParams
+        
+        when (position) {
+            "left" -> {
+                layoutParams.gravity = android.view.Gravity.START
+                alphabetIndex.setPadding(
+                    resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8,
+                    0,
+                    0,
+                    0
+                )
+            }
+            "right" -> {
+                layoutParams.gravity = android.view.Gravity.END
+                alphabetIndex.setPadding(
+                    0,
+                    0,
+                    resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8,
+                    0
+                )
+            }
+        }
+        alphabetIndex.layoutParams = layoutParams
+        alphabetIndex.visibility = if (sharedPreferenceManager.isAlphabetIndexEnabled()) View.VISIBLE else View.GONE
+    }
+    
+    private fun scrollToLetter(letter: String) {
+        val targetLetter = if (letter == "#") null else letter
+        
+        var targetPosition = -1
+        for (i in installedApps.indices) {
+            val app = installedApps[i]
+            val name = sharedPreferenceManager.getAppName(
+                app.first.componentName.flattenToString(),
+                app.third,
+                AppNameResolver.resolveBaseLabel(this, app.first)
+            ).toString()
+            
+            val firstChar = name.firstOrNull()?.uppercase()
+            if (targetLetter == null) {
+                if (firstChar != null && !firstChar.single().isLetter()) {
+                    targetPosition = i
+                    break
+                }
+            } else if (firstChar == targetLetter) {
+                targetPosition = i
+                break
+            }
+        }
+        
+        if (targetPosition >= 0) {
+            appRecycler.scrollToPosition(targetPosition)
         }
     }
 

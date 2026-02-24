@@ -380,6 +380,14 @@ class SharedPreferenceManager(private val context: Context) {
         return preferences.getBoolean("webSearchEnabled", false) && isSearchEnabled() && !isAutoLaunchEnabled()
     }
 
+    fun isAlphabetIndexEnabled(): Boolean {
+        return preferences.getBoolean("alphabetIndexEnabled", false)
+    }
+
+    fun getAlphabetIndexPosition(): String? {
+        return preferences.getString("alphabetIndexPosition", "right")
+    }
+
     // Hidden Apps
     fun setAppHidden(componentName: String, profile: Int, hidden: Boolean) {
         preferences.edit {

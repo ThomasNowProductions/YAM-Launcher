@@ -36,6 +36,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:defaultValue="false"
+            android:title="@string/alphabet_index_enabled"
+            app:key="alphabetIndexEnabled"
+            app:summary="@string/alphabet_index_summary" />
+        <eu.ottop.yamlauncher.settings.SpinnerPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="right"
+            android:entries="@array/alphabet_index_position_options"
+            android:entryValues="@array/alphabet_index_position_values"
+            app:dependency="alphabetIndexEnabled"
+            app:key="alphabetIndexPosition"
+            app:title="@string/alphabet_index_position"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
             android:title="@string/contacts_menu"
             app:key="contactsEnabled" />
         <SwitchPreference

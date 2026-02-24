@@ -38,38 +38,56 @@
             android:textSize="36sp"
             app:drawableStartCompat="@drawable/edit_24px" />
 
-        <ViewSwitcher
-            android:id="@+id/menuView"
+        <FrameLayout
+            android:id="@+id/menuContainer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.1"
             android:clipToPadding="false">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/appRecycler"
+            <ViewSwitcher
+                android:id="@+id/menuView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:fadingEdgeLength="20dp"
-                android:padding="0dp"
-                android:requiresFadingEdge="vertical"
-                android:scrollbars="none">
+                android:clipToPadding="false">
 
-            </androidx.recyclerview.widget.RecyclerView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/appRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:fadingEdgeLength="20dp"
+                    android:padding="0dp"
+                    android:requiresFadingEdge="vertical"
+                    android:scrollbars="none">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/contactRecycler"
-                android:layout_width="match_parent"
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/contactRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:fadingEdgeLength="20dp"
+                    android:padding="0dp"
+                    android:requiresFadingEdge="vertical"
+                    android:scrollbars="none">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </ViewSwitcher>
+
+            <eu.ottop.yamlauncher.views.AlphabetIndexView
+                android:id="@+id/alphabetIndex"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:fadingEdgeLength="20dp"
-                android:padding="0dp"
-                android:requiresFadingEdge="vertical"
-                android:scrollbars="none">
+                android:layout_gravity="end"
+                android:paddingStart="4dp"
+                android:paddingEnd="8dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-            </androidx.recyclerview.widget.RecyclerView>
-
-        </ViewSwitcher>
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/searchLayout"

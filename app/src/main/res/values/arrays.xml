@@ -96,4 +96,9 @@
         <item>@string/double_tap_action_lock_screen</item>
         <item>@string/double_tap_action_app</item>
     </string-array>
+
+    <string-array name="alphabet_index_position_options">
+        <item>@string/alphabet_index_left</item>
+        <item>@string/alphabet_index_right</item>
+    </string-array>
 </resources>

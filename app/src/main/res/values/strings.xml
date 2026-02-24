@@ -141,6 +141,12 @@
     <string name="permission_denied">Permission Denied</string>
     <string name="internet_search">Web Search Button</string>
 
+    <string name="alphabet_index_enabled">Alphabet Index</string>
+    <string name="alphabet_index_summary">Show a letter sidebar for quick navigation</string>
+    <string name="alphabet_index_position">Index Position</string>
+    <string name="alphabet_index_left">Left</string>
+    <string name="alphabet_index_right">Right</string>
+
     <string name="context_menu_settings_title">Context Menu Settings</string>
     <string name="context_menu_settings_text">Context Menu</string>
     <string name="context_menu_settings_summary">Enable/disable context menu items</string>

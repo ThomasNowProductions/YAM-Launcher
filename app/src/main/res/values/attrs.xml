@@ -5,4 +5,10 @@
         <attr name="android:entryValues" />
         <attr name="android:defaultValue" />
     </declare-styleable>
+
+    <declare-styleable name="AlphabetIndexView">
+        <attr name="indexTextColor" format="color" />
+        <attr name="indexHighlightColor" format="color" />
+        <attr name="indexTextSize" format="dimension" />
+    </declare-styleable>
 </resources>

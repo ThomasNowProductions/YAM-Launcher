@@ -28,6 +28,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.GestureDetector
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -1390,6 +1391,54 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         backToHome()
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (binding.homeView.isVisible && event.action == KeyEvent.ACTION_DOWN) {
+            val keyCode = event.keyCode
+            val unicodeChar = event.unicodeChar
+            
+            if (unicodeChar != 0 && !KeyEvent.isModifierKey(keyCode)) {
+                val char = unicodeChar.toChar()
+                if (char.isLetterOrDigit()) {
+                    openAppMenuWithChar(char.toString())
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun openAppMenuWithChar(char: String) {
+        appAdapter?.shortcutTextView = null
+        contactAdapter?.shortcutTextView = null
+        menuTitle.visibility = View.GONE
+        uiUtils.setWebSearchVisibility(internetSearch)
+        
+        searchView.setText(char)
+        searchView.setSelection(searchView.text?.length ?: 0)
+        
+        toAppMenuWithKeyboard()
+    }
+
+    private fun toAppMenuWithKeyboard() {
+        uiUtils.setContactsVisibility(searchSwitcher, binding.searchLayout, binding.searchReplacement)
+
+        try {
+            appRecycler.scrollToPosition(0)
+            menuView.displayedChild = 0
+            if (searchSwitcher.isVisible) {
+                contactRecycler.scrollToPosition(0)
+                setAppViewDetails()
+            }
+        } catch (_: UninitializedPropertyAccessException) {
+        }
+        animations.showApps(binding.homeView, binding.appView)
+        animations.backgroundIn(this@MainActivity)
+        
+        searchView.requestFocus()
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun onDestroy() {

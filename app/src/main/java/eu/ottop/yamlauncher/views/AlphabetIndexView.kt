@@ -1,5 +1,7 @@
 package eu.ottop.yamlauncher.views
 
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -26,13 +28,23 @@ class AlphabetIndexView @JvmOverloads constructor(
     private var minTextSize: Float = 32f
     private var maxTextSize: Float = 56f
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
+    }
+    
+    private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
     }
 
     private var selectedIndex = -1
+    private var previousSelectedIndex = -1
     private var availableLetters: Set<String> = emptySet()
     private var onLetterSelectedListener: ((String) -> Unit)? = null
+    
+    private var animatedRadius = 0f
+    private var animatedAlpha = 0
+    private var animatorSet: AnimatorSet? = null
+    private var fixedHeight: Int = 0
 
     init {
         context.withStyledAttributes(attrs, R.styleable.AlphabetIndexView, defStyleAttr, 0) {
@@ -44,6 +56,12 @@ class AlphabetIndexView @JvmOverloads constructor(
                 maxTextSize = attrTextSize * 1.75f
             }
         }
+    }
+    
+    private fun calculateFixedWidth(): Int {
+        textPaint.textSize = maxTextSize
+        val maxWidth = letters.maxOf { textPaint.measureText(it) }
+        return (maxWidth + paddingLeft + paddingRight + 16).toInt()
     }
 
     fun setAvailableLetters(letters: Set<String>) {
@@ -68,6 +86,7 @@ class AlphabetIndexView @JvmOverloads constructor(
     fun setTextSize(size: Float) {
         minTextSize = size
         maxTextSize = size * 1.75f
+        requestLayout()
         invalidate()
     }
 
@@ -79,7 +98,7 @@ class AlphabetIndexView @JvmOverloads constructor(
         val letterHeight = height.toFloat() / letters.size
         val calculatedTextSize = letterHeight * 0.8f
         val textSize = calculatedTextSize.coerceIn(minTextSize, maxTextSize)
-        paint.textSize = textSize
+        textPaint.textSize = textSize
 
         val centerX = width / 2f
 
@@ -87,30 +106,58 @@ class AlphabetIndexView @JvmOverloads constructor(
             val y = letterHeight * (index + 0.5f)
             val isAvailable = availableLetters.contains(letter)
             
-            if (index == selectedIndex) {
-                val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = setAlpha(highlightColor, 40)
-                    style = Paint.Style.FILL
+            if (index == selectedIndex || (index == previousSelectedIndex && animatedAlpha > 0)) {
+                val radius = if (index == selectedIndex) {
+                    textSize * 0.7f
+                } else {
+                    animatedRadius
                 }
-                val radius = textSize * 0.7f
+                val alpha = if (index == selectedIndex) {
+                    40
+                } else {
+                    animatedAlpha
+                }
+                bgPaint.color = Color.argb(alpha, Color.red(highlightColor), Color.green(highlightColor), Color.blue(highlightColor))
                 canvas.drawCircle(centerX, y, radius, bgPaint)
             }
             
-            paint.color = when {
+            textPaint.color = when {
                 index == selectedIndex -> highlightColor
                 isAvailable -> textColor
-                else -> setAlpha(textColor, 80)
+                else -> Color.argb(80, Color.red(textColor), Color.green(textColor), Color.blue(textColor))
             }
             
-            canvas.drawText(letter, centerX, y + paint.textSize / 3, paint)
+            canvas.drawText(letter, centerX, y + textPaint.textSize / 3, textPaint)
         }
     }
 
-    private fun setAlpha(color: Int, alpha: Int): Int {
-        val r = Color.red(color)
-        val g = Color.green(color)
-        val b = Color.blue(color)
-        return Color.argb(alpha, r, g, b)
+    private fun animateSelectionEnd() {
+        animatorSet?.cancel()
+        
+        val textSize = textPaint.textSize
+        val startRadius = textSize * 0.7f
+        val endRadius = textSize * 1.2f
+        
+        val radiusAnimator = ValueAnimator.ofFloat(startRadius, endRadius).apply {
+            duration = 150
+            addUpdateListener { animation ->
+                animatedRadius = animation.animatedValue as Float
+                invalidate()
+            }
+        }
+        
+        val alphaAnimator = ValueAnimator.ofInt(40, 0).apply {
+            duration = 150
+            addUpdateListener { animation ->
+                animatedAlpha = animation.animatedValue as Int
+                invalidate()
+            }
+        }
+        
+        animatorSet = AnimatorSet().apply {
+            playTogether(radiusAnimator, alphaAnimator)
+            start()
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -122,6 +169,10 @@ class AlphabetIndexView @JvmOverloads constructor(
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 if (selectedIndex != index) {
+                    if (selectedIndex >= 0) {
+                        previousSelectedIndex = selectedIndex
+                        animateSelectionEnd()
+                    }
                     selectedIndex = index
                     if (availableLetters.contains(letter)) {
                         onLetterSelectedListener?.invoke(letter)
@@ -131,6 +182,10 @@ class AlphabetIndexView @JvmOverloads constructor(
                 return true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (selectedIndex >= 0) {
+                    previousSelectedIndex = selectedIndex
+                    animateSelectionEnd()
+                }
                 selectedIndex = -1
                 invalidate()
                 return true
@@ -140,19 +195,19 @@ class AlphabetIndexView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val height = MeasureSpec.getSize(heightMeasureSpec)
-        val letterHeight = height.toFloat() / letters.size
-        val calculatedTextSize = letterHeight * 0.8f
-        val textSize = calculatedTextSize.coerceIn(minTextSize, maxTextSize)
-
-        val desiredWidth = (textSize + paddingLeft + paddingRight + 16).toInt()
-
-        val width = when (MeasureSpec.getMode(widthMeasureSpec)) {
-            MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec)
-            MeasureSpec.AT_MOST -> minOf(desiredWidth, MeasureSpec.getSize(widthMeasureSpec))
-            else -> desiredWidth
+        val fixedWidth = calculateFixedWidth()
+        
+        val measuredHeight = MeasureSpec.getSize(heightMeasureSpec)
+        if (fixedHeight == 0 && measuredHeight > 0) {
+            fixedHeight = measuredHeight
         }
-
-        setMeasuredDimension(width, height)
+        
+        val height = if (fixedHeight > 0) fixedHeight else measuredHeight
+        setMeasuredDimension(fixedWidth, height)
+    }
+    
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        animatorSet?.cancel()
     }
 }

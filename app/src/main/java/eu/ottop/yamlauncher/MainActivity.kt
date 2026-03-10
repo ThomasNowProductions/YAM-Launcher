@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
@@ -1614,7 +1615,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val intent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
         }
-        val resolveInfo = packageManager.resolveActivity(intent, 0)
+        val resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolveInfo?.activityInfo?.packageName == packageName
     }
 

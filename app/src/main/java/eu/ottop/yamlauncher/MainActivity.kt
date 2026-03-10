@@ -854,6 +854,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     setAlphabetIndexPosition()
                     if (sharedPreferenceManager.isAlphabetIndexEnabled()) {
                         setupAlphabetIndex()
+                    } else {
+                        alphabetIndex.visibility = View.GONE
                     }
                 }
 
@@ -948,7 +950,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     appSearchIndexDirty = true
                     
                     if (sharedPreferenceManager.isAlphabetIndexEnabled()) {
-                        updateAlphabetIndexLetters()
+                        refreshAlphabetIndex(currentFilteredApps)
                     }
                 }
             }
@@ -1007,6 +1009,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun setupApps() {
         lifecycleScope.launch(Dispatchers.Default) {
             installedApps = appUtils.getInstalledApps()
+            currentFilteredApps = installedApps
             val newApps = installedApps.toMutableList()
 
             // Pre-build search index so the first keystroke doesn't hitch.
@@ -1030,35 +1033,46 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (!sharedPreferenceManager.isAlphabetIndexEnabled()) {
             return
         }
-        
-        alphabetIndex.setTextColor(sharedPreferenceManager.getTextColor())
-        updateAlphabetIndexLetters()
-        setAlphabetIndexPosition()
-        
-        alphabetIndex.setOnLetterSelectedListener { letter ->
-            scrollToLetter(letter)
+        lifecycleScope.launch(Dispatchers.Main) {
+            alphabetIndex.setOnLetterSelectedListener { letter ->
+                scrollToLetter(letter, currentFilteredApps)
+            }
+            refreshAlphabetIndex(currentFilteredApps)
         }
     }
     
-    private fun updateAlphabetIndexLetters() {
+    private fun refreshAlphabetIndex(apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>) {
+        val availableLetters = buildAlphabetIndexLetters(apps)
+        alphabetIndex.post {
+            if (!sharedPreferenceManager.isAlphabetIndexEnabled() || menuView.displayedChild != 0) {
+                alphabetIndex.visibility = View.GONE
+                return@post
+            }
+            alphabetIndex.setTextColor(sharedPreferenceManager.getTextColor())
+            alphabetIndex.setAvailableLetters(availableLetters)
+            setAlphabetIndexPosition()
+            alphabetIndex.visibility = if (availableLetters.isNotEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun buildAlphabetIndexLetters(apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>): Set<String> {
         val availableLetters = mutableSetOf<String>()
-        for (app in installedApps) {
+        for (app in apps) {
             val name = sharedPreferenceManager.getAppName(
                 app.first.componentName.flattenToString(),
                 app.third,
                 AppNameResolver.resolveBaseLabel(this, app.first)
             ).toString()
-            
-            val firstChar = name.firstOrNull()?.uppercase()
-            if (firstChar != null) {
-                if (firstChar.single().isLetter()) {
-                    availableLetters.add(firstChar)
-                } else {
-                    availableLetters.add("#")
-                }
-            }
+            availableLetters.add(getAlphabetIndexKey(name))
         }
-        alphabetIndex.setAvailableLetters(availableLetters)
+        return availableLetters
+    }
+
+    private fun getAlphabetIndexKey(name: String): String {
+        val trimmed = name.trimStart()
+        if (trimmed.isEmpty()) return "#"
+        val firstChar = trimmed.first()
+        return if (firstChar.isLetter()) firstChar.uppercaseChar().toString() else "#"
     }
     
     private fun setAlphabetIndexPosition() {
@@ -1068,46 +1082,33 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         when (position) {
             "left" -> {
                 layoutParams.gravity = android.view.Gravity.START
-                alphabetIndex.setPadding(
-                    resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8,
-                    0,
-                    0,
-                    0
-                )
             }
             "right" -> {
                 layoutParams.gravity = android.view.Gravity.END
-                alphabetIndex.setPadding(
-                    0,
-                    0,
-                    resources.getDimensionPixelSize(android.R.dimen.app_icon_size) / 8,
-                    0
-                )
             }
         }
         alphabetIndex.layoutParams = layoutParams
-        alphabetIndex.visibility = if (sharedPreferenceManager.isAlphabetIndexEnabled()) View.VISIBLE else View.GONE
     }
     
-    private fun scrollToLetter(letter: String) {
+    private fun scrollToLetter(letter: String, apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>) {
         val targetLetter = if (letter == "#") null else letter
         
         var targetPosition = -1
-        for (i in installedApps.indices) {
-            val app = installedApps[i]
+        for (i in apps.indices) {
+            val app = apps[i]
             val name = sharedPreferenceManager.getAppName(
                 app.first.componentName.flattenToString(),
                 app.third,
                 AppNameResolver.resolveBaseLabel(this, app.first)
             ).toString()
-            
-            val firstChar = name.firstOrNull()?.uppercase()
+
+            val letterKey = getAlphabetIndexKey(name)
             if (targetLetter == null) {
-                if (firstChar != null && !firstChar.single().isLetter()) {
+                if (letterKey == "#") {
                     targetPosition = i
                     break
                 }
-            } else if (firstChar == targetLetter) {
+            } else if (letterKey == targetLetter) {
                 targetPosition = i
                 break
             }
@@ -1205,6 +1206,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             )
         )
         searchSwitcher.contentDescription = getString(R.string.switch_to_contacts)
+        refreshAlphabetIndex(currentFilteredApps)
     }
 
     private fun setContactViewDetails() {
@@ -1217,6 +1219,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         searchSwitcher.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.apps_24px, null))
         searchSwitcher.contentDescription = getString(R.string.switch_to_apps)
+        alphabetIndex.visibility = View.GONE
     }
 
     private fun getContacts(filterString: String): MutableList<Pair<String, Int>> {
@@ -1326,7 +1329,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ): List<Triple<LauncherActivityInfo, UserHandle, Int>>? {
         if (cleanQuery.isNullOrEmpty()) {
             isSearchActive = false
+            currentFilteredApps = installedApps
             updateMenu(installedApps) // Use the original installed apps list
+            refreshAlphabetIndex(currentFilteredApps)
             return null
         } else {
             isSearchActive = true
@@ -1372,6 +1377,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         } else {
             updateMenu(newFilteredApps)
             currentFilteredApps = newFilteredApps
+            refreshAlphabetIndex(currentFilteredApps)
         }
     }
 

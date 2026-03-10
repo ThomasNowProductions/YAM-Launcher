@@ -25,6 +25,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
     private var doubleTapAppPref: Preference? = null
     private var clockApp: Preference? = null
     private var dateApp: Preference? = null
+    private var weatherApp: Preference? = null
     private var notificationDotsPref: SwitchPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -35,6 +36,7 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
 
         clockApp = findPreference("clockSwipeApp")
         dateApp = findPreference("dateSwipeApp")
+        weatherApp = findPreference("weatherApp")
 
         gpsLocationPref = findPreference("gpsLocation")
         manualLocationPref = findPreference("manualLocation")
@@ -110,6 +112,12 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
                 true
             }
 
+        weatherApp?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                uiUtils.switchFragment(requireActivity(), GestureAppsFragment("weather"))
+                true
+            }
+
         notificationDotsPref?.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _, newValue ->
                 if (newValue as Boolean && !NotificationListener.isEnabled(requireContext())) {
@@ -128,6 +136,8 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
         clockApp?.summary = sharedPreferenceManager.getGestureName("clock")
 
         dateApp?.summary = sharedPreferenceManager.getGestureName("date")
+
+        weatherApp?.summary = sharedPreferenceManager.getWeatherAppName()
 
         manualLocationPref?.summary = sharedPreferenceManager.getWeatherRegion()
 

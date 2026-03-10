@@ -106,6 +106,7 @@
     <string name="weather_update_interval">Update Interval</string>
     <string name="weather_update_interval_summary">e.g., 15m, 6h, 1d (minimum 1m)</string>
     <string name="units">Units</string>
+    <string name="set_weather_app">Set Weather App</string>
 
     <string name="shortcuts">Shortcuts</string>
     <string name="number_of_shortcuts">Number of Shortcuts</string>

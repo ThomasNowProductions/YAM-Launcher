@@ -271,6 +271,21 @@ class SharedPreferenceManager(private val context: Context) {
         return preferences.getBoolean("dateClick", true)
     }
 
+    fun setWeatherApp(appInfo: String?) {
+        preferences.edit {
+            putString("weatherApp", appInfo)
+        }
+    }
+
+    fun getWeatherApp(): String? {
+        return preferences.getString("weatherApp", null)
+    }
+
+    fun getWeatherAppName(): String? {
+        val name = preferences.getString("weatherApp", "")?.split("§splitter§")
+        return name?.get(0)
+    }
+
     // Gestures
     fun setGestures(direction: String, appInfo: String?) {
         preferences.edit {

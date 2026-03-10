@@ -606,7 +606,22 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
 
         dateText.setOnClickListener { _ ->
-            if (sharedPreferenceManager.isDateGestureEnabled()) {
+            val weatherAppInfo = sharedPreferenceManager.getWeatherApp()
+            if (sharedPreferenceManager.isWeatherEnabled() && !weatherAppInfo.isNullOrEmpty()) {
+                try {
+                    val appInfo = weatherAppInfo.split("§splitter§")
+                    if (appInfo.size >= 3) {
+                        val componentName = ComponentName.unflattenFromString(appInfo[1])
+                        val profile = appInfo[2].toIntOrNull()
+                        if (componentName != null && profile != null && profile < launcherApps.profiles.size) {
+                            launcherApps.startMainActivity(componentName, launcherApps.profiles[profile], null, null)
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.e("MainActivity", "Failed to launch weather app", e)
+                    Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
+                }
+            } else if (sharedPreferenceManager.isDateGestureEnabled()) {
 
                 if (sharedPreferenceManager.isGestureEnabled("date") && dateApp.first != null && dateApp.second != null) {
                     try {

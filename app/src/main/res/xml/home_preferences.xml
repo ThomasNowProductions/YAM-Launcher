@@ -150,6 +150,13 @@
             app:key="weatherUpdateInterval"
             app:title="@string/weather_update_interval"
             app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dependency="weatherEnabled"
+            app:key="weatherApp"
+            app:selectable="true"
+            app:title="@string/set_weather_app" />
     </PreferenceCategory>
     <PreferenceCategory
         android:layout_width="wrap_content"

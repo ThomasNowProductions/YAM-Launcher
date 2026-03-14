@@ -14,7 +14,7 @@
         <item name="colorAccent">#FF80CBC4</item>
     </style>
 
-    <style name="SettingsTheme" parent="Theme.AppCompat">
+    <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@color/settings_bg</item>
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

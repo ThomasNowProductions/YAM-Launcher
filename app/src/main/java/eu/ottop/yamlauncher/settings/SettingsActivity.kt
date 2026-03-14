@@ -59,6 +59,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         uiUtils.setBackground(window)
         preferences.registerOnSharedPreferenceChangeListener(this)
 
+        setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.settings_title)
         supportActionBar?.setDisplayShowTitleEnabled(true)

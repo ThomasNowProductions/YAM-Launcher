@@ -98,4 +98,4 @@ You can optionally enable accessibility services for YAM Launcher if you choose 
 
 [GitHub (main)](https://github.com/ThomasNowProductions/YAM-Launcher/)
 
-[Codeberg (secondary](https://codeberg.org/ThomasNowProductions/YAM-Launcher)
+[Codeberg (secondary)](https://codeberg.org/ThomasNowProductions/YAM-Launcher)

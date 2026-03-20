@@ -125,6 +125,9 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
     }
 
     private fun showConfirmationDialog(locationName: String?, latitude: String?, longitude: String?) {
+        if (locationName == null || latitude == null || longitude == null) {
+            return
+        }
         MaterialAlertDialogBuilder(requireContext()).apply {
             setTitle(getString(R.string.confirm_title))
             setMessage("${getString(R.string.app_confirm_text)} $locationName?")
@@ -138,7 +141,7 @@ class LocationFragment : Fragment(), LocationListAdapter.OnItemClickListener, Ti
         }.create().show()
     }
 
-    private fun performConfirmedAction(locationName: String?, latitude: String?, longitude: String?) {
+    private fun performConfirmedAction(locationName: String, latitude: String, longitude: String) {
         sharedPreferenceManager.setWeatherLocation("latitude=${latitude}&longitude=${longitude}", locationName)
         requireActivity().supportFragmentManager.popBackStack()
     }

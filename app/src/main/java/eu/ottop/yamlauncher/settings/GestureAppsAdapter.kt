@@ -36,8 +36,11 @@ class GestureAppsAdapter(
         init {
             textView.setOnClickListener {
                 val position = bindingAdapterPosition
-                val app = apps[position].first
-                itemClickListener.onItemClick(app, apps[position].third)
+                if (position == RecyclerView.NO_POSITION || position >= apps.size) {
+                    return@setOnClickListener
+                }
+                val appEntry = apps.getOrNull(position) ?: return@setOnClickListener
+                itemClickListener.onItemClick(appEntry.first, appEntry.third)
 
             }
         }
@@ -50,6 +53,9 @@ class GestureAppsAdapter(
     }
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
+        if (position >= apps.size) {
+            return
+        }
         val app = apps[position]
 
         if (app.third != 0) {

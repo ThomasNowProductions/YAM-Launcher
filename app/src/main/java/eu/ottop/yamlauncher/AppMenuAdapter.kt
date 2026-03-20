@@ -139,6 +139,9 @@ class AppMenuAdapter(
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         holder.editView.visibility = View.INVISIBLE
+        if (position >= apps.size) {
+            return
+        }
         val app = apps[position]
 
         if (sharedPreferenceManager.isAppPinned(app.first.componentName.flattenToString(), app.third)) {
@@ -148,12 +151,12 @@ class AppMenuAdapter(
             else {
                 holder.textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(activity.resources, R.drawable.keep_15px, null),null,ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null)
             }
-            holder.textView.compoundDrawables[0].colorFilter = BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
+            holder.textView.compoundDrawables.getOrNull(0)?.colorFilter = BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
         }
         // Set initial drawables
         else if (app.third != 0) {
             holder.textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_work_app, null),null, ResourcesCompat.getDrawable(activity.resources, R.drawable.ic_empty, null),null)
-            holder.textView.compoundDrawables[0].colorFilter =
+            holder.textView.compoundDrawables.getOrNull(0)?.colorFilter =
                 BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
         }
         else {

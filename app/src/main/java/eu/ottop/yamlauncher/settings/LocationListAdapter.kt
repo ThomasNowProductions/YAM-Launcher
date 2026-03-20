@@ -33,10 +33,11 @@ class LocationListAdapter(
 
             listItem.setOnClickListener {
                 val position = bindingAdapterPosition
-                if (position == RecyclerView.NO_POSITION) return@setOnClickListener
-                val name = locations[position]["name"]
-                val latitude = locations[position]["latitude"]
-                val longitude = locations[position]["longitude"]
+                if (position == RecyclerView.NO_POSITION || position >= locations.size) return@setOnClickListener
+                val locationEntry = locations.getOrNull(position) ?: return@setOnClickListener
+                val name = locationEntry["name"]
+                val latitude = locationEntry["latitude"]
+                val longitude = locationEntry["longitude"]
                 itemClickListener.onItemClick(name, latitude, longitude)
 
             }
@@ -50,6 +51,9 @@ class LocationListAdapter(
     }
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
+        if (position >= locations.size) {
+            return
+        }
         val location = locations[position]
 
         uiUtils.setAppAlignment(holder.textView, null, holder.regionText)

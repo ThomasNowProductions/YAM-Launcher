@@ -323,22 +323,34 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
 
         if (requestCode == 0) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as HomeSettingsFragment
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fragment.setLocationPreference(true)
-            } else {
-                Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
-                fragment.setLocationPreference(false)
+            try {
+                val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as? HomeSettingsFragment
+                if (fragment != null) {
+                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        fragment.setLocationPreference(true)
+                    } else {
+                        Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+                        fragment.setLocationPreference(false)
+                    }
+                }
+            } catch (e: Exception) {
+                logger.e("SettingsActivity", "Error handling location permission result", e)
             }
         }
 
         if (requestCode == 1) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as AppMenuSettingsFragment
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fragment.setContactPreference(true)
-            } else {
-                Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
-                fragment.setContactPreference(false)
+            try {
+                val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as? AppMenuSettingsFragment
+                if (fragment != null) {
+                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        fragment.setContactPreference(true)
+                    } else {
+                        Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+                        fragment.setContactPreference(false)
+                    }
+                }
+            } catch (e: Exception) {
+                logger.e("SettingsActivity", "Error handling contacts permission result", e)
             }
         }
     }

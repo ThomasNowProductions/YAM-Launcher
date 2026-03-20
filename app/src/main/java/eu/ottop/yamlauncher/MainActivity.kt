@@ -160,15 +160,24 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private var appSearchIndexDirty = true
 
     private fun buildAppSearchIndex(apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>): List<AppSearchEntry> {
-        return apps.map { appItem ->
-            val name = sharedPreferenceManager.getAppName(
-                appItem.first.componentName.flattenToString(),
-                appItem.third,
-                AppNameResolver.resolveBaseLabel(this, appItem.first)
-            ).toString()
+        return apps.mapNotNull { appItem ->
+            try {
+                val name = sharedPreferenceManager.getAppName(
+                    appItem.first.componentName.flattenToString(),
+                    appItem.third,
+                    AppNameResolver.resolveBaseLabel(this, appItem.first)
+                ).toString()
 
-            val cleaned = stringUtils.cleanString(name).orEmpty()
-            AppSearchEntry(appItem, cleaned, cleaned.lowercase())
+                val cleaned = stringUtils.cleanString(name).orEmpty()
+                if (cleaned.isNotEmpty()) {
+                    AppSearchEntry(appItem, cleaned, cleaned.lowercase())
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                logger.w("MainActivity", "Error building search index for app: ${appItem.first.componentName.packageName}")
+                null
+            }
         }
     }
 
@@ -375,13 +384,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 val imm =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(menuTitle.windowToken, 0)
-                val savedView = sharedPreferenceManager.getShortcut(index)!!
+                val savedView = sharedPreferenceManager.getShortcut(index)
                 textView.text = menuTitle.text
                 try {
                     sharedPreferenceManager.setShortcut(
                         index,
                         textView.text,
-                        savedView[0],
+                        savedView!![0],
                         savedView[1].toInt(),
                         savedView.getOrNull(3)?.toBoolean() ?: false
                     )
@@ -389,7 +398,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     sharedPreferenceManager.setShortcut(
                         index,
                         textView.text,
-                        savedView[0],
+                        savedView!![0],
                         0,
                         savedView.getOrNull(3)?.toBoolean() ?: false
                     )
@@ -444,14 +453,17 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun setShortcutSetup(textView: TextView, savedView: List<String>?) {
-        textView.text = savedView?.get(2)
+        textView.text = savedView?.getOrNull(2) ?: getString(R.string.shortcut_default)
         
         if (savedView?.getOrNull(3)?.toBoolean() == true) {
-            setShortcutContactListeners(textView, savedView[1].toInt())
+            val contactId = savedView.getOrNull(1)?.toIntOrNull()
+            if (contactId != null) {
+                setShortcutContactListeners(textView, contactId)
+            }
             return
         }
         
-        if (savedView?.get(1) != "0") {
+        if (savedView?.getOrNull(1) != "0") {
             textView.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(resources, R.drawable.ic_work_app, null), null, null, null)
         }
         
@@ -463,7 +475,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             if (savedView != null && canLaunchShortcut) {
                 val profileIndex = validateProfileIndex(savedView) ?: return@setOnClickListener
                 val componentName = resolveComponentName(savedView, profileIndex) ?: return@setOnClickListener
-                appUtils.launchApp(componentName, launcherApps.profiles[profileIndex])
+                if (profileIndex in launcherApps.profiles.indices) {
+                    appUtils.launchApp(componentName, launcherApps.profiles[profileIndex])
+                }
             }
         }
     }
@@ -1018,12 +1032,18 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun buildAlphabetIndexLetters(apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>): Set<String> {
         val availableLetters = mutableSetOf<String>()
         for (app in apps) {
-            val name = sharedPreferenceManager.getAppName(
-                app.first.componentName.flattenToString(),
-                app.third,
-                AppNameResolver.resolveBaseLabel(this, app.first)
-            ).toString()
-            availableLetters.add(getAlphabetIndexKey(name))
+            try {
+                val name = sharedPreferenceManager.getAppName(
+                    app.first.componentName.flattenToString(),
+                    app.third,
+                    AppNameResolver.resolveBaseLabel(this, app.first)
+                ).toString()
+                if (name.isNotEmpty()) {
+                    availableLetters.add(getAlphabetIndexKey(name))
+                }
+            } catch (e: Exception) {
+                logger.w("MainActivity", "Error getting app name for alphabet index: ${app.first.componentName.packageName}")
+            }
         }
         return availableLetters
     }
@@ -1055,22 +1075,26 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         var targetPosition = -1
         for (i in apps.indices) {
-            val app = apps[i]
-            val name = sharedPreferenceManager.getAppName(
-                app.first.componentName.flattenToString(),
-                app.third,
-                AppNameResolver.resolveBaseLabel(this, app.first)
-            ).toString()
+            val app = apps.getOrNull(i) ?: continue
+            try {
+                val name = sharedPreferenceManager.getAppName(
+                    app.first.componentName.flattenToString(),
+                    app.third,
+                    AppNameResolver.resolveBaseLabel(this, app.first)
+                ).toString()
 
-            val letterKey = getAlphabetIndexKey(name)
-            if (targetLetter == null) {
-                if (letterKey == "#") {
+                val letterKey = getAlphabetIndexKey(name)
+                if (targetLetter == null) {
+                    if (letterKey == "#") {
+                        targetPosition = i
+                        break
+                    }
+                } else if (letterKey == targetLetter) {
                     targetPosition = i
                     break
                 }
-            } else if (letterKey == targetLetter) {
-                targetPosition = i
-                break
+            } catch (e: Exception) {
+                logger.w("MainActivity", "Error in scrollToLetter for app at position $i")
             }
         }
 
@@ -1731,7 +1755,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
 
-        binding.root.addOnLayoutChangeListener(renameLayoutListener!!)
+        renameLayoutListener?.let {
+            binding.root.addOnLayoutChangeListener(it)
+        }
 
         editText.setOnEditorActionListener { _, actionId, _ ->
 
@@ -1841,9 +1867,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                         "left"
                     )
                 ) {
-                    if (leftSwipeActivity.first != null && leftSwipeActivity.second != null) {
+                    if (leftSwipeActivity.first != null && leftSwipeActivity.second != null && leftSwipeActivity.second!! in launcherApps.profiles.indices) {
                         canLaunchShortcut = false
-                        appUtils.launchApp(leftSwipeActivity.first!!.componentName, launcherApps.profiles[leftSwipeActivity.second!!])
+                        try {
+                            appUtils.launchApp(leftSwipeActivity.first!!.componentName, launcherApps.profiles[leftSwipeActivity.second!!])
+                        } catch (e: Exception) {
+                            logger.e("MainActivity", "Failed to launch left swipe app", e)
+                            Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         logger.w("MainActivity", "Left swipe gesture failed: no app configured")
                         Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
@@ -1856,9 +1887,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                         "right"
                     )
                 ) {
-                    if (rightSwipeActivity.first != null && rightSwipeActivity.second != null) {
+                    if (rightSwipeActivity.first != null && rightSwipeActivity.second != null && rightSwipeActivity.second!! in launcherApps.profiles.indices) {
                         canLaunchShortcut = false
-                        appUtils.launchApp(rightSwipeActivity.first!!.componentName, launcherApps.profiles[rightSwipeActivity.second!!])
+                        try {
+                            appUtils.launchApp(rightSwipeActivity.first!!.componentName, launcherApps.profiles[rightSwipeActivity.second!!])
+                        } catch (e: Exception) {
+                            logger.e("MainActivity", "Failed to launch right swipe app", e)
+                            Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         logger.w("MainActivity", "Right swipe gesture failed: no app configured")
                         Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
@@ -1877,8 +1913,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             if (sharedPreferenceManager.isDoubleTapEnabled()) {
                 when (sharedPreferenceManager.getDoubleTapAction()) {
                     "app" -> {
-                        if (doubleTapApp.first != null && doubleTapApp.second != null) {
-                            appUtils.launchApp(doubleTapApp.first!!.componentName, launcherApps.profiles[doubleTapApp.second!!])
+                        if (doubleTapApp.first != null && doubleTapApp.second != null && doubleTapApp.second!! in launcherApps.profiles.indices) {
+                            try {
+                                appUtils.launchApp(doubleTapApp.first!!.componentName, launcherApps.profiles[doubleTapApp.second!!])
+                            } catch (e: Exception) {
+                                logger.e("MainActivity", "Failed to launch double tap app", e)
+                                Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
+                            }
                         } else {
                             Toast.makeText(this@MainActivity, getString(R.string.launch_error), Toast.LENGTH_SHORT).show()
                         }

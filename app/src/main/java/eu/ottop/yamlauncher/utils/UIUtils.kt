@@ -110,15 +110,16 @@ class UIUtils(private val context: Context) {
             hasMethod(view, "setTextColor") -> {
                 val textView = view as TextView
                 textView.setTextColor(color)
+                val drawables = textView.compoundDrawables
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    textView.compoundDrawables[0]?.colorFilter =
+                    drawables.getOrNull(0)?.colorFilter =
                         BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
-                    textView.compoundDrawables[2]?.colorFilter =
+                    drawables.getOrNull(2)?.colorFilter =
                         BlendModeColorFilter(sharedPreferenceManager.getTextColor(), BlendMode.SRC_ATOP)
                 } else {
-                    textView.compoundDrawables[0]?.colorFilter =
+                    drawables.getOrNull(0)?.colorFilter =
                         PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
-                    textView.compoundDrawables[2]?.colorFilter =
+                    drawables.getOrNull(2)?.colorFilter =
                         PorterDuffColorFilter(sharedPreferenceManager.getTextColor(), PorterDuff.Mode.SRC_ATOP)
                 }
 
@@ -180,15 +181,16 @@ class UIUtils(private val context: Context) {
         view.setTextColor(setAlpha(color, alphaHex))
         view.setHintTextColor(setAlpha(color, "A9"))
 
+        val drawables = view.compoundDrawables
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            view.compoundDrawables[0]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
-            view.compoundDrawables[2]?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+            drawables.getOrNull(0)?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+            drawables.getOrNull(2)?.mutate()?.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
         } else {
-            view.compoundDrawables[0]?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
-            view.compoundDrawables[2]?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+            drawables.getOrNull(0)?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+            drawables.getOrNull(2)?.mutate()?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
         }
-        view.compoundDrawables[0]?.alpha = "A9".toInt(16)
-        view.compoundDrawables[2]?.alpha = "A9".toInt(16)
+        drawables.getOrNull(0)?.alpha = "A9".toInt(16)
+        drawables.getOrNull(2)?.alpha = "A9".toInt(16)
 
         // Apply text shadow if enabled
         if (sharedPreferenceManager.isTextShadowEnabled()) {
@@ -377,10 +379,13 @@ class UIUtils(private val context: Context) {
 
     fun setDrawables(textView: TextView, alignment: String?, alignments: Array<String> = arrayOf("left","center","right")) {
         try {
+            val drawables = textView.compoundDrawables.filterNotNull()
+            val firstDrawable = drawables.firstOrNull() ?: return
+            
             when (alignment) {
                 alignments[0] -> {
                     textView.setCompoundDrawablesWithIntrinsicBounds(
-                        textView.compoundDrawables.filterNotNull().first(),
+                        firstDrawable,
                         null,
                         null,
                         null
@@ -389,9 +394,9 @@ class UIUtils(private val context: Context) {
 
                 alignments[1] -> {
                     textView.setCompoundDrawablesWithIntrinsicBounds(
-                        textView.compoundDrawables.filterNotNull().first(),
+                        firstDrawable,
                         null,
-                        textView.compoundDrawables.filterNotNull().first(),
+                        firstDrawable,
                         null
                     )
                 }
@@ -400,7 +405,7 @@ class UIUtils(private val context: Context) {
                     textView.setCompoundDrawablesWithIntrinsicBounds(
                         null,
                         null,
-                        textView.compoundDrawables.filterNotNull().first(),
+                        firstDrawable,
                         null
                     )
                 }

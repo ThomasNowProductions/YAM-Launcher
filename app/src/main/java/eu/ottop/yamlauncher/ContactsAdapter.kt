@@ -63,11 +63,12 @@ class ContactsAdapter(
                     return@setOnClickListener
                 }
                 
-                if (shortcutTextView != null) {
-                    val contact = contacts[position]
-                    contactShortcutListener.onContactShortcut(contact.second, contact.first, shortcutTextView!!, shortcutIndex)
+                val localShortcutTextView = shortcutTextView
+                if (localShortcutTextView != null) {
+                    val contact = contacts.getOrNull(position) ?: return@setOnClickListener
+                    contactShortcutListener.onContactShortcut(contact.second, contact.first, localShortcutTextView, shortcutIndex)
                 } else {
-                    val contact = contacts[position]
+                    val contact = contacts.getOrNull(position) ?: return@setOnClickListener
                     contactClickListener.onContactClick(contact.second)
                 }
             }

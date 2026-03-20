@@ -37,7 +37,12 @@ class SharedPreferenceManager(private val context: Context) {
         if (bgColor == "material") {
             return getThemeColor(com.google.android.material.R.attr.colorOnPrimary)
         }
-        return bgColor!!.toColorInt()
+        return try {
+            bgColor?.toColorInt() ?: 0x00000000.toInt()
+        } catch (e: Exception) {
+            logger.e("SharedPreferenceManager", "Error parsing bgColor: $bgColor", e)
+            0x00000000.toInt()
+        }
     }
 
     fun getTextColor(): Int {
@@ -45,7 +50,12 @@ class SharedPreferenceManager(private val context: Context) {
         if (textColor == "material") {
             return getThemeColor(com.google.android.material.R.attr.colorPrimary)
         }
-        return textColor!!.toColorInt()
+        return try {
+            textColor?.toColorInt() ?: 0xFFF3F3F3.toInt()
+        } catch (e: Exception) {
+            logger.e("SharedPreferenceManager", "Error parsing textColor: $textColor", e)
+            0xFFF3F3F3.toInt()
+        }
     }
 
     fun getTextString(): String? {
@@ -166,12 +176,15 @@ class SharedPreferenceManager(private val context: Context) {
 
     private fun getPinnedApps(): List<Pair<String, Int?>> {
         val pinnedApps = mutableListOf<Pair<String, Int?>>()
-        val pinnedAppList = getPinnedAppString()?.split("§section§")
+        val pinnedAppString = getPinnedAppString() ?: return pinnedApps
+        val pinnedAppList = pinnedAppString.split("§section§")
 
-        pinnedAppList?.forEach {
-            val app = it.split("§splitter§")
+        for (item in pinnedAppList) {
+            if (item.isBlank()) continue
+            val app = item.split("§splitter§")
             if (app.size > 1) {
-                pinnedApps.add(Pair(app[0], app[1].toIntOrNull()))
+                val profile = app.getOrNull(1)?.toIntOrNull()
+                pinnedApps.add(Pair(app[0], profile))
             }
         }
 
@@ -384,7 +397,12 @@ class SharedPreferenceManager(private val context: Context) {
             return appName
         }
 
-        val packageName = componentName.substringBefore("/")
+        val packageName = try {
+            componentName.substringBefore("/")
+        } catch (e: Exception) {
+            logger.w("SharedPreferenceManager", "Error parsing component name: $componentName")
+            componentName
+        }
         if (savedName == packageName || savedName == componentName) {
             preferences.edit(commit = true) {
                 val latestValue = preferences.getString(key, null)

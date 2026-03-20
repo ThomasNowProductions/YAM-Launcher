@@ -1326,6 +1326,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             val exactMatches = mutableListOf<Triple<LauncherActivityInfo, UserHandle, Int>>()
             val otherMatches = mutableListOf<Triple<LauncherActivityInfo, UserHandle, Int>>()
 
+            //List containing apps whose name starts with the specified query
+            val startWithMatches = mutableListOf<Triple<LauncherActivityInfo, UserHandle, Int>>()
+
             for (entry in appSearchIndex) {
                 if (entry.cleaned.isEmpty()) continue
 
@@ -1333,14 +1336,21 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 val contains = entry.cleanedLower.contains(queryLower)
                 if (!contains && !fuzzyMatch) continue
 
-                if (entry.cleanedLower == queryLower) {
-                    exactMatches.add(entry.item)
-                } else {
-                    otherMatches.add(entry.item)
+                // Each matching app is placed into a priority bucket based on how closely it matches the query
+                when{
+                    entry.cleanedLower == queryLower -> exactMatches.add(entry.item)
+                    entry.cleanedLower.startsWith(queryLower) -> startWithMatches.add(entry.item)
+                    else -> otherMatches.add(entry.item)
                 }
+
             }
 
-            return FilterResult(exactMatches + otherMatches, false)
+            // Results are ordered in the following order:
+            // 1. exactMatches - app name that is equal to the query
+            // 2. startWithMatches - app name starts with the query
+            // 3. otherMatches - app name contains the query
+            // -- Within each bucket the alphabetic order is preserved --
+            return FilterResult(exactMatches + startWithMatches + otherMatches, false)
         }
     }
 
@@ -1351,6 +1361,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             updateMenu(newFilteredApps)
             currentFilteredApps = newFilteredApps
             refreshAlphabetIndex(currentFilteredApps)
+            appRecycler.scrollToPosition(0);
         }
     }
 

@@ -1,5 +1,22 @@
 package eu.ottop.yamlauncher
 
+/**
+ * MainActivity serves as the primary Android launcher activity for YAM Launcher.
+ * It handles the home screen display, app menu, gesture detection, search functionality,
+ * contacts integration, weather display, and various launcher interactions.
+ *
+ * Key responsibilities:
+ * - Display home screen with clock, date, weather info, and app shortcuts
+ * - Manage app menu with search and filtering capabilities
+ * - Handle swipe gestures for navigation and app launching
+ * - Integrate with contacts for quick access
+ * - Display battery status and notification indicators
+ * - Support multi-user/work profile environments
+ *
+ * The activity implements multiple listener interfaces to handle app menu interactions,
+ * shortcut selection, contact actions, and bottom sheet dialogs.
+ */
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.SearchManager
@@ -91,6 +108,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     AppMenuAdapter.OnShortcutListener, AppMenuAdapter.OnItemLongClickListener, ContactsAdapter.OnContactClickListener,
     ContactsAdapter.OnContactShortcutListener, AppActionBottomSheet.AppActionListener {
 
+    /**
+     * Resource IDs for the 15 home screen shortcut slots.
+     * These correspond to TextViews in the layout that can be configured to launch apps or contacts.
+     */
     companion object {
         private val SHORTCUT_IDS = listOf(
             R.id.app1, R.id.app2, R.id.app3, R.id.app4, R.id.app5,
@@ -99,8 +120,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         )
     }
 
+    /** Handles weather data fetching and temperature display */
     private lateinit var weatherSystem: WeatherSystem
+    /** Utilities for launching apps and managing installed applications */
     private lateinit var appUtils: AppUtils
+    /** Manages biometric authentication for locked settings */
     private lateinit var biometricUtils: BiometricUtils
 
     private val stringUtils = StringUtils()
@@ -159,6 +183,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private var appSearchIndex: List<AppSearchEntry> = emptyList()
     private var appSearchIndexDirty = true
 
+    /**
+     * Builds a searchable index of installed apps with cleaned, lowercase names.
+     * This pre-computed index enables fast fuzzy search without repeated string processing.
+     *
+     * @param apps List of installed app information with user handles and profile indices
+     * @return List of search entries with original app data and cleaned name variants
+     */
     private fun buildAppSearchIndex(apps: List<Triple<LauncherActivityInfo, UserHandle, Int>>): List<AppSearchEntry> {
         return apps.mapNotNull { appItem ->
             try {
@@ -198,6 +229,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private val handler = Handler(Looper.getMainLooper())
 
+    /**
+     * Called when the activity is first created.
+     * Initializes view binding, utilities, preferences, listeners, and starts background tasks.
+     * Sets up periodic app menu refresh and weather updates via coroutines.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -215,7 +251,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         setHomeListeners()
 
-        // Task to update the app menu every 5 seconds
+        // Task to update the app menu every 5 seconds to detect newly installed/removed apps
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (true) {
@@ -225,7 +261,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
 
-        // Task to update the weather periodically
+        // Task to update the weather periodically based on configured interval
         lifecycleScope.launch(Dispatchers.IO) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (true) {
@@ -245,6 +281,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    /**
+     * Initializes all utility classes, view references, and gesture detectors.
+     * Called during onCreate to set up the core components of the launcher.
+     */
     private fun setMainVariables() {
         launcherApps = getSystemService(LAUNCHER_APPS_SERVICE) as LauncherApps
 
@@ -283,6 +323,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
+    /**
+     * Configures the home screen shortcuts based on user preferences.
+     * Shows/hides shortcuts based on configured count and sets up click/long-click listeners.
+     */
     private fun setShortcuts() {
         val shortcutNo = sharedPreferenceManager.getShortcutNumber()
 
@@ -743,7 +787,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         toAppMenu()
     }
 
-    // Only reload items that have had preferences changed
+    /**
+     * Handles shared preference changes to dynamically update UI elements.
+     * Only reloads specific components affected by the changed preference key
+     * rather than reloading everything for better performance.
+     *
+     * @param preferences The SharedPreferences instance that changed
+     * @param key The key of the preference that changed
+     */
     @SuppressLint("UseKtx")
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
         if (preferences == null || key == null) return
@@ -1303,6 +1354,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val isEmptyQuery: Boolean
     )
 
+    /**
+     * Filters app/contact lists based on the search query.
+     * Updates the currently displayed list and alphabet index accordingly.
+     * Uses debouncing to prevent excessive filtering during fast typing.
+     *
+     * @param query The search string to filter by
+     */
     private suspend fun filterItems(query: String?) {
         val cleanQuery = stringUtils.cleanString(query)
         when (menuView.displayedChild) {
@@ -1332,6 +1390,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    /**
+     * Performs fuzzy or exact matching of apps against the search query.
+     * Results are sorted by relevance: exact matches first, then prefix matches,
+     * then contains matches. Within each bucket, alphabetical order is preserved.
+     *
+     * @param cleanQuery Sanitized lowercase search query
+     * @param updatedApps List of apps to filter through
+     * @return FilterResult containing prioritized matching apps or empty query indicator
+     */
     private suspend fun getFilteredApps(
         cleanQuery: String?,
         updatedApps: List<Triple<LauncherActivityInfo, UserHandle, Int>>
@@ -1661,6 +1728,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         backToHome()
     }
 
+    /**
+     * Called when an app item is long-pressed, showing the app action bottom sheet.
+     * Allows users to pin, hide, rename apps or view app info.
+     */
     override fun onItemLongClick(
         appInfo: LauncherActivityInfo,
         userHandle: UserHandle,
@@ -1670,6 +1741,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         bottomSheet.show(supportFragmentManager, AppActionBottomSheet.TAG)
     }
 
+    /**
+     * Pins or unpins an app, affecting its display position in the app menu.
+     * Pinned apps appear first in the list for quick access.
+     */
     override fun onPinApp(appActivity: LauncherActivityInfo, workProfile: Int) {
         val componentName = appActivity.componentName.flattenToString()
         sharedPreferenceManager.setPinnedApp(componentName, workProfile)
@@ -1723,6 +1798,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private var renameLayoutListener: View.OnLayoutChangeListener? = null
 
+    /**
+     * Initiates rename mode for an app, showing an edit field for custom naming.
+     * Automatically exits when the keyboard is closed or action is confirmed.
+     * Supports resetting to the original app name via the reset button.
+     */
     private fun startRenameMode(textView: TextView, editLayout: LinearLayout, appActivity: LauncherActivityInfo, userHandle: UserHandle, workProfile: Int) {
         disableAppMenuScroll()
         textView.visibility = View.INVISIBLE
@@ -1847,6 +1927,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    /**
+     * Handles gesture detection for home screen interactions.
+     * Supports swipe gestures (up/down/left/right), long press for settings,
+     * and double tap for configured actions or screen lock.
+     *
+     * Swipe up opens the app menu, swipe down expands notifications,
+     * swipe left/right launch configured apps, and double tap can lock screen
+     * or launch a configured app based on user preferences.
+     */
     open inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -1962,6 +2051,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     }
 
+    /**
+     * TextGestureListener extends GestureListener but disables long press.
+     * Used for shortcut TextViews where long press should trigger app selection
+     * rather than opening settings.
+     */
     inner class TextGestureListener : GestureListener() {
         override fun onLongPress(e: MotionEvent) {
 

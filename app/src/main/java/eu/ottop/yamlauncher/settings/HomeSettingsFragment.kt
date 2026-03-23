@@ -1,8 +1,14 @@
 package eu.ottop.yamlauncher.settings
 
+import android.Manifest
 import android.os.Bundle
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import eu.ottop.yamlauncher.R
+import eu.ottop.yamlauncher.tasks.NotificationListener
+import eu.ottop.yamlauncher.utils.PermissionUtils
+import eu.ottop.yamlauncher.utils.UIUtils
 
 /**
  * Home screen settings fragment.

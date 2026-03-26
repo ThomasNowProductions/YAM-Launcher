@@ -4,7 +4,7 @@
     <!--About page links-->
     <string name="my_website_link" translatable="false">created by Otto, maintained by ThomasNow Productions</string>
     <string name="codeberg_link" translatable="false"><![CDATA[<a href="https://codeberg.org/ThomasNowProductions/yamlauncher">Codeberg</a>]]></string>
-    <string name="github_link" translatable="false"><![CDATA[<a href="https://github.com/ThomasNowProductions/yam_launcher">View this project on GitHub</a>]]></string>
+    <string name="github_link" translatable="false"><![CDATA[<a href="https://codeberg.org/ThomasNowProductions/yamlauncher">View this project on Codeberg</a>]]></string>
     <string name="fdroid_link" translatable="false"><![CDATA[<a href="https://f-droid.org/en/packages/eu.ottop.yamlauncher/">F-Droid</a>]]></string>
     <string name="izzy_link" translatable="false"><![CDATA[<a href="https://apt.izzysoft.de/fdroid/index/apk/eu.ottop.yamlauncher">IzzyOnDroid</a>]]></string>
     <string name="play_link" translatable="false"><![CDATA[<a href="https://play.google.com/store/apps/details?id=eu.ottop.yamlauncher&pcampaignid=web_share">Google Play</a>]]></string>

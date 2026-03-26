@@ -1,8 +1,5 @@
-> [!WARNING]
-> GitHub randomly decided to susped my account, including the YAM Launcher repository. I'm in contact with support to get it resolved as soon as possible. In the meantime, some images may not load or some links might be broken.
-
 <p align="center">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/featureGraphic.png" width=100%/>
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/featureGraphic.png" width=100%/>
 </p>
 
 # YAM Launcher
@@ -30,18 +27,18 @@ Key features:
     height="80">](https://f-droid.org/en/packages/eu.ottop.yamlauncher)
 
 ### IzzyOnDroid
-[<img src="https://github.com/user-attachments/assets/0e6a8084-f056-4db1-9ba3-58b4edb578d0"
+[<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/badges/izzyondroid.png"
 alt="Get it on IzzyOnDroid"
 height="55">](https://apt.izzysoft.de/fdroid/index/apk/eu.ottop.yamlauncher)
 
 ### Google Play
-[<img src="https://github.com/user-attachments/assets/18e22711-eadc-4757-8b47-7588cfa9ab8d"
+[<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/badges/googleplay.png"
     alt="Get it on Google Play"
     height="55">](https://play.google.com/store/apps/details?id=eu.ottop.yamlauncher)
 
 ### APK
 
-1. Download the [APK](https://github.com/ThomasNowProductions/YAM-Launcher/releases).
+1. Download the [APK](https://codeberg.org/ThomasNowProductions/YAM-Launcher/releases).
 2. Enable the permission to install apps for your browser/files (app you are installing the launcher from).
 3. Install the launcher.
 
@@ -58,26 +55,26 @@ To fix (only if you want to enable the double tap to lock feature):
 ## Screenshots
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/phoneScreenshots/1.png"
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/phoneScreenshots/1.png"
     alt="Weather At Your Fingertips"
     width="19%">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/phoneScreenshots/2.png"
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/phoneScreenshots/2.png"
     alt="Absolute Minimalism"
     width="19%">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/phoneScreenshots/3.png"
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/phoneScreenshots/3.png"
     alt="Function Over Form"
     width="19%">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/phoneScreenshots/4.png"
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/phoneScreenshots/4.png"
     alt="Material You"
     width="19%">
-<img src="https://raw.githubusercontent.com/ThomasNowProductions/YAM-Launcher/refs/heads/main/metadata/en-US/images/phoneScreenshots/5.png"
+<img src="https://codeberg.org/ThomasNowProductions/YAM-Launcher/raw/branch/main/metadata/en-US/images/phoneScreenshots/5.png"
     alt="Make It Yours"
     width="19%">
 </p>
 
 ## Privacy
 
-Read the full privacy policy [here](https://github.com/ThomasNowProductions/YAM-Launcher/blob/main/PrivacyPolicy.md).
+Read the full privacy policy [here](https://codeberg.org/ThomasNowProductions/YAM-Launcher/src/branch/main/PrivacyPolicy.md).
 
 No data leaves your device by default and no data is sent to the developer, ever. 
 
@@ -99,6 +96,6 @@ You can optionally enable accessibility services for YAM Launcher if you choose 
 
 ## Mirrors
 
-[GitHub (main)](https://github.com/ThomasNowProductions/YAM-Launcher/)
+[Codeberg (main)](https://codeberg.org/ThomasNowProductions/YAM-Launcher/)
 
-[Codeberg (secondary)](https://codeberg.org/ThomasNowProductions/YAM-Launcher)
+[GitHub (secondary)](https://github.com/ThomasNowProductions/YAM-Launcher/)

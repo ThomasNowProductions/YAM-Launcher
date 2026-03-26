@@ -177,7 +177,7 @@
     <!--About page links-->
     <string name="my_website_link"><![CDATA[by <a href="https://ottop.rip">Otto Petäjä</a>]]></string>
     <string name="codeberg_link"><![CDATA[<a href="https://codeberg.org/ottoptj/yamlauncher">Codeberg</a>]]></string>
-    <string name="github_link"><![CDATA[<a href="https://github.com/ottop/yam_launcher">GitHub</a>]]></string>
+    <string name="github_link"><![CDATA[<a href="https://codeberg.org/ottoptj/yamlauncher">Codeberg</a>]]></string>
     <string name="weather_link"><![CDATA[Dati meteo da <a href="https://open-meteo.com/">Open-Meteo.com</a><br>(<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)]]></string>
 
     <string name="reset">Ripristina</string>

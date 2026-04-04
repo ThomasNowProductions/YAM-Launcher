@@ -81,7 +81,12 @@ fun backgroundIn(activity: Activity) {
     val originalColor = sharedPreferenceManager.getBgColor()
 
     // Only animate darkness onto the transparent background if enabled
-    if (originalColor == Color.parseColor("#00000000") && sharedPreferenceManager.isAppDrawerDarkeningEnabled()) {
+    // Skip animation if both app drawer and homescreen dimming are enabled (smooth transition)
+    val appDrawerDimming = sharedPreferenceManager.isAppDrawerDarkeningEnabled()
+    val homeDimming = sharedPreferenceManager.isHomescreenDarkeningEnabled()
+    val useAnimation = appDrawerDimming && !(homeDimming && originalColor == Color.parseColor("#00000000"))
+
+    if (useAnimation) {
             val newColor = Color.parseColor("#3F000000")
 
             val backgroundColorAnimator = ValueAnimator.ofObject(ArgbEvaluator(), originalColor, newColor)
@@ -110,13 +115,17 @@ fun backgroundOut(activity: Activity, duration: Long) {
     val originalColor = sharedPreferenceManager.getBgColor()
     val bgColor = sharedPreferenceManager.getBgColor()
 
-    // If homescreen darkening is enabled, keep the dark background
-    if (bgColor == Color.parseColor("#00000000") && sharedPreferenceManager.isHomescreenDarkeningEnabled()) {
+    // Skip animation if both app drawer and homescreen dimming are enabled
+    val appDrawerDimming = sharedPreferenceManager.isAppDrawerDarkeningEnabled()
+    val homeDimming = sharedPreferenceManager.isHomescreenDarkeningEnabled()
+    val useAnimation = appDrawerDimming && !(homeDimming && originalColor == Color.parseColor("#00000000"))
+
+    if (!useAnimation) {
         return
     }
 
     // Only animate darkness onto the transparent background if enabled
-    if (originalColor == Color.parseColor("#00000000") && sharedPreferenceManager.isAppDrawerDarkeningEnabled()) {
+    if (originalColor == Color.parseColor("#00000000") && appDrawerDimming) {
         val darkColor = Color.parseColor("#3F000000")
 
         val backgroundColorAnimator = ValueAnimator.ofObject(ArgbEvaluator(), darkColor, originalColor)

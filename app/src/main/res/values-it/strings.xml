@@ -86,6 +86,9 @@
     <string name="swipe_threshold">Soglia swipe</string>
     <string name="swipe_velocity_threshold">Soglia velocità swipe</string>
     <string name="show_status_bar">Mostra barra di stato</string>
+    <string name="app_drawer_darkening">Oscuramento sfondo cassetto delle app</string>
+    <string name="settings_darkening">Oscuramento sfondo panello impostazioni</string>
+    <string name="homescreen_darkening">Oscuramento sfondo schermata principale</string>
     <string name="enable_confirmation">Conferma l\'avvio dell\'app</string>
     <string
         name="launch_confirmation_text"

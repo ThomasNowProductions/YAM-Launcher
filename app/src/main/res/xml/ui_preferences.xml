@@ -84,6 +84,12 @@
         <SwitchPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:title="@string/homescreen_darkening"
+            app:key="homescreenDarkening" />
+        <SwitchPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:defaultValue="true"
             android:title="@string/app_drawer_darkening"
             app:key="appDrawerDarkening" />

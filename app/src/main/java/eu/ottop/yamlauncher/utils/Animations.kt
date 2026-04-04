@@ -101,29 +101,36 @@ fun backgroundIn(activity: Activity) {
 /**
  * Animates semi-transparent overlay disappearing on return to home.
  * Only animates if background is fully transparent and darkening is enabled.
+ * If homescreen darkening is enabled, keeps the dark background.
  *
  * @param activity The activity to animate
  * @param duration Animation duration in milliseconds
  */
 fun backgroundOut(activity: Activity, duration: Long) {
-    val newColor = sharedPreferenceManager.getBgColor()
+    val originalColor = sharedPreferenceManager.getBgColor()
+    val bgColor = sharedPreferenceManager.getBgColor()
+
+    // If homescreen darkening is enabled, keep the dark background
+    if (bgColor == Color.parseColor("#00000000") && sharedPreferenceManager.isHomescreenDarkeningEnabled()) {
+        return
+    }
 
     // Only animate darkness onto the transparent background if enabled
-    if (newColor == Color.parseColor("#00000000") && sharedPreferenceManager.isAppDrawerDarkeningEnabled()) {
-            val originalColor = Color.parseColor("#3F000000")
+    if (originalColor == Color.parseColor("#00000000") && sharedPreferenceManager.isAppDrawerDarkeningEnabled()) {
+        val darkColor = Color.parseColor("#3F000000")
 
-            val backgroundColorAnimator = ValueAnimator.ofObject(ArgbEvaluator(), originalColor, newColor)
-            backgroundColorAnimator.addUpdateListener { animator ->
-                activity.window.decorView.setBackgroundColor(animator.animatedValue as Int)
-            }
-
-            backgroundColorAnimator.duration = duration
-
-            backgroundColorAnimator.start()
-        } else {
-            return
+        val backgroundColorAnimator = ValueAnimator.ofObject(ArgbEvaluator(), darkColor, originalColor)
+        backgroundColorAnimator.addUpdateListener { animator ->
+            activity.window.decorView.setBackgroundColor(animator.animatedValue as Int)
         }
+
+        backgroundColorAnimator.duration = duration
+
+        backgroundColorAnimator.start()
+    } else {
+        return
     }
+}
 
     // ============================================
     // Private Animation Extensions

@@ -126,6 +126,11 @@ class SharedPreferenceManager(private val context: Context) {
     fun isSettingsDarkeningEnabled(): Boolean = preferences.getBooleanOrDefault("settingsDarkening", true)
 
     /**
+     * Checks if homescreen darkening is enabled.
+     */
+    fun isHomescreenDarkeningEnabled(): Boolean = preferences.getBooleanOrDefault("homescreenDarkening", false)
+
+    /**
      * Gets animation speed in milliseconds.
      */
     fun getAnimationSpeed(): Long {

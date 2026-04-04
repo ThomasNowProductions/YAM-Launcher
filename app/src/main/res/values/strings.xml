@@ -79,6 +79,7 @@
     <string name="show_status_bar">Show Status Bar</string>
     <string name="app_drawer_darkening">App Drawer Darkening</string>
     <string name="settings_darkening">Settings Panel Darkening</string>
+    <string name="homescreen_darkening">Homescreen Darkening</string>
     <string name="enable_confirmation">App Confirmation Dialog</string>
     <string
         name="launch_confirmation_text"

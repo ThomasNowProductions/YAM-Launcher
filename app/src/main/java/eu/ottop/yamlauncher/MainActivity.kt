@@ -588,7 +588,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun setPreferences() {
-        uiUtils.setBackground(window)
+        uiUtils.setBackground(window, applyHomescreenDarkening = true)
 
         uiUtils.setTextFont(binding.homeView)
         uiUtils.setFont(searchView)
@@ -801,7 +801,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (preferences == null || key == null) return
 
         when (key) {
-            "bgColor" -> uiUtils.setBackground(window)
+            "bgColor", "homescreenDarkening" -> uiUtils.setBackground(window, applyHomescreenDarkening = true)
 
             "textColor" -> {
                 uiUtils.setTextColors(binding.homeView)

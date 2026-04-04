@@ -131,14 +131,19 @@ class UIUtils(private val context: Context) {
      * If background is fully transparent, applies dark overlay for settings panels.
      *
      * @param window Window to style
-     * @param applyDarkening Whether to apply dark overlay for transparent backgrounds
+     * @param applyDarkening Whether to apply dark overlay (settings) for transparent backgrounds
+     * @param applyHomescreenDarkening Whether to apply dark overlay for homescreen
      */
-    fun setBackground(window: Window, applyDarkening: Boolean = false) {
+    fun setBackground(window: Window, applyDarkening: Boolean = false, applyHomescreenDarkening: Boolean = false) {
         val bgColor = sharedPreferenceManager.getBgColor()
-        val finalColor = if (applyDarkening && bgColor == Color.parseColor("#00000000") && sharedPreferenceManager.isSettingsDarkeningEnabled()) {
-            Color.parseColor("#3F000000")
-        } else {
-            bgColor
+        val finalColor = when {
+            applyHomescreenDarkening && bgColor == Color.parseColor("#00000000") && sharedPreferenceManager.isHomescreenDarkeningEnabled() -> {
+                Color.parseColor("#3F000000")
+            }
+            applyDarkening && bgColor == Color.parseColor("#00000000") && sharedPreferenceManager.isSettingsDarkeningEnabled() -> {
+                Color.parseColor("#3F000000")
+            }
+            else -> bgColor
         }
         window.decorView.setBackgroundColor(finalColor)
     }

@@ -826,6 +826,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     alphabetIndex.setTextShadow(sharedPreferenceManager.isTextShadowEnabled())
                 }
                 appAdapter?.onPreferencesChanged()
+                contactAdapter?.onPreferencesChanged()
             }
 
             "textShadow" -> {
@@ -838,6 +839,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     alphabetIndex.setTextShadow(sharedPreferenceManager.isTextShadowEnabled())
                 }
                 appAdapter?.onPreferencesChanged()
+                contactAdapter?.onPreferencesChanged()
             }
 
             "textFont", "textStyle" -> {
@@ -845,6 +847,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 uiUtils.setFont(searchView)
                 uiUtils.setFont(menuTitle)
                 appAdapter?.onPreferencesChanged()
+                contactAdapter?.onPreferencesChanged()
             }
 
             "clockEnabled" -> uiUtils.setClockVisibility(clock)
@@ -903,6 +906,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     setupContactRecycler()
                 }
                 appAdapter?.onPreferencesChanged()
+                contactAdapter?.onPreferencesChanged()
             }
 
             "appMenuAlignment" -> appAdapter?.onPreferencesChanged()
